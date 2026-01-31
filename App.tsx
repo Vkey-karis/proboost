@@ -1,24 +1,36 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, Suspense } from 'react';
 import { Header } from './components/Header.tsx';
 import { Footer } from './components/Footer.tsx';
-import { Dashboard } from './components/Dashboard.tsx';
-import { ContentGenerator } from './components/ContentGenerator.tsx';
-import { ProfileOptimizer } from './components/ProfileOptimizer.tsx';
-import { ApplicationAssistant } from './components/ApplicationAssistant.tsx';
-import { CaseStudyWriter } from './components/CaseStudyWriter.tsx';
-import { JobPostCreator } from './components/JobPostCreator.tsx';
-import { History } from './components/History.tsx';
 import { FeatureName } from './types.ts';
-import { ProfileCreator } from './components/ProfileCreator.tsx';
-import { NewsToPost } from './components/NewsToPost.tsx';
-import { NetworkingAssistant } from './components/NetworkingAssistant.tsx';
-import { Resources } from './components/Resources.tsx';
-import { Legal } from './components/Legal.tsx';
-import { JobSearchTool } from './components/JobSearchTool.tsx';
-import { JobDescriptionFetcher } from './components/JobDescriptionFetcher.tsx';
-import { InterviewPrepTool } from './components/InterviewPrepTool.tsx';
-import { Settings } from './components/Settings.tsx';
+import { Spinner } from './components/common/Spinner.tsx';
+
+// Lazy Load Components
+const Dashboard = React.lazy(() => import('./components/Dashboard.tsx').then(module => ({ default: module.Dashboard })));
+const ContentGenerator = React.lazy(() => import('./components/ContentGenerator.tsx').then(module => ({ default: module.ContentGenerator })));
+const ProfileOptimizer = React.lazy(() => import('./components/ProfileOptimizer.tsx').then(module => ({ default: module.ProfileOptimizer })));
+const ApplicationAssistant = React.lazy(() => import('./components/ApplicationAssistant.tsx').then(module => ({ default: module.ApplicationAssistant })));
+const CaseStudyWriter = React.lazy(() => import('./components/CaseStudyWriter.tsx').then(module => ({ default: module.CaseStudyWriter })));
+const JobPostCreator = React.lazy(() => import('./components/JobPostCreator.tsx').then(module => ({ default: module.JobPostCreator })));
+const History = React.lazy(() => import('./components/History.tsx').then(module => ({ default: module.History })));
+const ProfileCreator = React.lazy(() => import('./components/ProfileCreator.tsx').then(module => ({ default: module.ProfileCreator })));
+const NewsToPost = React.lazy(() => import('./components/NewsToPost.tsx').then(module => ({ default: module.NewsToPost })));
+const NetworkingAssistant = React.lazy(() => import('./components/NetworkingAssistant.tsx').then(module => ({ default: module.NetworkingAssistant })));
+const Resources = React.lazy(() => import('./components/Resources.tsx').then(module => ({ default: module.Resources })));
+const Legal = React.lazy(() => import('./components/Legal.tsx').then(module => ({ default: module.Legal })));
+const JobSearchTool = React.lazy(() => import('./components/JobSearchTool.tsx').then(module => ({ default: module.JobSearchTool })));
+const JobDescriptionFetcher = React.lazy(() => import('./components/JobDescriptionFetcher.tsx').then(module => ({ default: module.JobDescriptionFetcher })));
+const InterviewPrepTool = React.lazy(() => import('./components/InterviewPrepTool.tsx').then(module => ({ default: module.InterviewPrepTool })));
+const Settings = React.lazy(() => import('./components/Settings.tsx').then(module => ({ default: module.Settings })));
+
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-[50vh] w-full">
+    <div className="text-center space-y-4">
+      <Spinner size="lg" className="text-primary-600 mx-auto" />
+      <p className="text-slate-400 text-sm font-medium animate-pulse">Loading experience...</p>
+    </div>
+  </div>
+);
 
 const App: React.FC = () => {
   const [activeFeature, setActiveFeature] = useState<FeatureName | null>(null);
@@ -27,17 +39,17 @@ const App: React.FC = () => {
   useEffect(() => {
     let title = "ProBoost AI | Your Friendly Career Helper";
     if (activeFeature) {
-        // Simple mapping for SEO titles
-        const titles: Partial<Record<FeatureName, string>> = {
-            [FeatureName.InterviewPrep]: "Interview Prep Pro | ProBoost AI",
-            [FeatureName.JobSearch]: "Live Job Search | ProBoost AI",
-            [FeatureName.ProfileOptimizer]: "LinkedIn SEO Optimizer | ProBoost AI",
-            [FeatureName.JobApplication]: "ATS Resume Helper | ProBoost AI",
-            [FeatureName.Resources]: "Pricing & Plans | ProBoost AI",
-            [FeatureName.Settings]: "Account Settings | ProBoost AI",
-            [FeatureName.NewsToPost]: "News-to-Viral AI | ProBoost AI",
-        };
-        title = titles[activeFeature] || `${activeFeature.replace(/([A-Z])/g, ' $1').trim()} | ProBoost AI`;
+      // Simple mapping for SEO titles
+      const titles: Partial<Record<FeatureName, string>> = {
+        [FeatureName.InterviewPrep]: "Interview Prep Pro | ProBoost AI",
+        [FeatureName.JobSearch]: "Live Job Search | ProBoost AI",
+        [FeatureName.ProfileOptimizer]: "LinkedIn SEO Optimizer | ProBoost AI",
+        [FeatureName.JobApplication]: "ATS Resume Helper | ProBoost AI",
+        [FeatureName.Resources]: "Pricing & Plans | ProBoost AI",
+        [FeatureName.Settings]: "Account Settings | ProBoost AI",
+        [FeatureName.NewsToPost]: "News-to-Viral AI | ProBoost AI",
+      };
+      title = titles[activeFeature] || `${activeFeature.replace(/([A-Z])/g, ' $1').trim()} | ProBoost AI`;
     }
     document.title = title;
   }, [activeFeature]);
@@ -80,7 +92,7 @@ const App: React.FC = () => {
         return <Dashboard onSelectFeature={setActiveFeature} />;
     }
   };
-  
+
   const handleBackToDashboard = useCallback(() => {
     setActiveFeature(null);
   }, []);
@@ -89,7 +101,9 @@ const App: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       <Header onBackToDashboard={handleBackToDashboard} onSelectFeature={setActiveFeature} />
       <main className="flex-grow p-4 sm:p-6 lg:p-8">
-        {renderActiveFeature()}
+        <Suspense fallback={<LoadingFallback />}>
+          {renderActiveFeature()}
+        </Suspense>
       </main>
       <Footer onSelectFeature={setActiveFeature} />
     </div>
