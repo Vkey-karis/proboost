@@ -45,6 +45,72 @@ const FAST_MODEL = 'gemini-flash-lite-latest';
 const SMART_MODEL = 'gemini-3-flash-preview';
 const PRO_THINKING_MODEL = 'gemini-3-pro-preview';
 
+// --- Rate Limiting & Error Handling ---
+
+class RequestQueue {
+  private queue: (() => Promise<void>)[] = [];
+  private activeRequests = 0;
+  private maxConcurrent = 3;
+
+  add<T>(task: () => Promise<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      this.queue.push(async () => {
+        try {
+          const result = await task();
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      });
+      this.processNext();
+    });
+  }
+
+  private async processNext() {
+    if (this.activeRequests >= this.maxConcurrent || this.queue.length === 0) return;
+
+    this.activeRequests++;
+    const task = this.queue.shift();
+
+    if (task) {
+      try {
+        await task();
+      } finally {
+        this.activeRequests--;
+        this.processNext();
+      }
+    }
+  }
+}
+
+const requestQueue = new RequestQueue();
+
+const retryWithBackoff = async <T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> => {
+  try {
+    return await fn();
+  } catch (error: any) {
+    // Check for 429 (Too Many Requests) or 503 (Service Unavailable)
+    const isRateLimit = error.status === 429 || (error.message && error.message.includes('429'));
+    const isServerOverload = error.status === 503 || (error.message && error.message.includes('503'));
+
+    if (retries > 0 && (isRateLimit || isServerOverload)) {
+      console.warn(`API Error ${error.status || 'unknown'}. Retrying in ${delay}ms...`);
+      await new Promise(res => setTimeout(res, delay));
+      return retryWithBackoff(fn, retries - 1, delay * 2);
+    }
+    throw error;
+  }
+};
+
+/**
+ * Wrapper to execute API calls safely with queuing and retry logic.
+ */
+const executeSafe = async <T>(operation: () => Promise<T>): Promise<T> => {
+  return requestQueue.add(() => retryWithBackoff(operation));
+};
+
+// --- End Rate Limiting & Error Handling ---
+
 const READABILITY_GUIDELINES = `
   TONE & STYLE RULES:
   - You are a very friendly and helpful Career Friend. 
@@ -69,7 +135,7 @@ export const translateContent = async (text: string, targetLanguage: string): Pr
   const ai = getAIClient();
   const prompt = `Please translate this for me into ${targetLanguage}. Keep it very friendly and simple. TEXT: ${text}`;
   try {
-    const response = await ai.models.generateContent({ model: FAST_MODEL, contents: prompt });
+    const response = await executeSafe(() => ai.models.generateContent({ model: FAST_MODEL, contents: prompt }));
     return response.text || text;
   } catch (error) { throw new Error("Translation failed."); }
 };
@@ -77,7 +143,7 @@ export const translateContent = async (text: string, targetLanguage: string): Pr
 export const generateLinkedInPosts = async (inputType: InputType, inputText: string, persona: Persona, wordCount: number, tone: string = 'Professional'): Promise<GeneratedContent> => {
   const ai = getAIClient();
   const prompt = `Help me write 3 simple LinkedIn posts for a ${persona}. INPUT: "${inputText}" TONE: ${tone}. Use about ${wordCount} words. ${READABILITY_GUIDELINES}`;
-  const response = await ai.models.generateContent({
+  const response = await executeSafe(() => ai.models.generateContent({
     model: SMART_MODEL,
     contents: prompt,
     config: {
@@ -97,14 +163,14 @@ export const generateLinkedInPosts = async (inputType: InputType, inputText: str
         }
       }
     }
-  });
+  }));
   return JSON.parse(response.text.trim());
 };
 
 export const generateApplicationAssets = async (jobDescription: string, resumeInfo: string, userEmail: string, template: ProfileTemplate = 'modern', atsCompliance: boolean = false): Promise<ApplicationAssets> => {
   const ai = getAIClient();
   const prompt = `I need a simple resume and cover letter. JOB: ${jobDescription} USER INFO: ${resumeInfo} ${ROI_PROMPT_TEMPLATE} ${READABILITY_GUIDELINES}`;
-  const response = await ai.models.generateContent({
+  const response = await executeSafe(() => ai.models.generateContent({
     model: PRO_THINKING_MODEL,
     contents: prompt,
     config: {
@@ -129,14 +195,14 @@ export const generateApplicationAssets = async (jobDescription: string, resumeIn
         required: ['coverLetter', 'resume', 'roiAnalysis']
       }
     }
-  });
+  }));
   return JSON.parse(response.text.trim());
 };
 
 export const generateInterviewGuide = async (jobDetails: string, companyName?: string): Promise<InterviewPrepAssets> => {
   const ai = getAIClient();
   const prompt = `Let's help someone get ready for an interview at ${companyName || 'this company'}. JOB DETAILS: "${jobDetails}" ${READABILITY_GUIDELINES} ${ROI_PROMPT_TEMPLATE}`;
-  const response = await ai.models.generateContent({
+  const response = await executeSafe(() => ai.models.generateContent({
     model: SMART_MODEL,
     contents: prompt,
     config: {
@@ -173,14 +239,14 @@ export const generateInterviewGuide = async (jobDetails: string, companyName?: s
         required: ['strategicGuide', 'questions', 'companyInsights', 'roi']
       }
     }
-  });
+  }));
   return JSON.parse(response.text.trim());
 };
 
 export const searchLiveJobs = async (profileSummary: string, location: string): Promise<JobSearchResult> => {
   const ai = getAIClient();
   const prompt = `Please find 5 active jobs for someone who says: "${profileSummary}" in "${location}". Give them some simple advice too. ${ROI_PROMPT_TEMPLATE} ${READABILITY_GUIDELINES}`;
-  const response = await ai.models.generateContent({
+  const response = await executeSafe(() => ai.models.generateContent({
     model: SMART_MODEL,
     contents: prompt,
     config: {
@@ -219,14 +285,14 @@ export const searchLiveJobs = async (profileSummary: string, location: string): 
         required: ['jobs', 'marketAnalysis', 'roi']
       }
     }
-  });
+  }));
   return JSON.parse(response.text.trim());
 };
 
 export const generateTrendingPosts = async (topic: string, persona: Persona): Promise<TrendingPostResult> => {
   const ai = getAIClient();
   const prompt = `Find 3 fun news items about "${topic}" and let's write simple posts for a ${persona}. ${READABILITY_GUIDELINES}`;
-  const response = await ai.models.generateContent({
+  const response = await executeSafe(() => ai.models.generateContent({
     model: SMART_MODEL,
     contents: prompt,
     config: {
@@ -264,14 +330,14 @@ export const generateTrendingPosts = async (topic: string, persona: Persona): Pr
         required: ['posts', 'sources']
       }
     },
-  });
+  }));
   return JSON.parse(response.text.trim());
 };
 
 export const optimizeLinkedInProfile = async (profile: any, goal: string): Promise<OptimizedProfile> => {
   const ai = getAIClient();
   const prompt = `Let's make this LinkedIn profile look great. GOAL: ${goal}. ${READABILITY_GUIDELINES}`;
-  const response = await ai.models.generateContent({
+  const response = await executeSafe(() => ai.models.generateContent({
     model: PRO_THINKING_MODEL,
     contents: prompt,
     config: {
@@ -290,14 +356,14 @@ export const optimizeLinkedInProfile = async (profile: any, goal: string): Promi
         required: ['headline', 'about', 'elevatorPitch', 'optimizedEducation', 'optimizedSkills', 'keywords']
       }
     }
-  });
+  }));
   return JSON.parse(response.text.trim());
 };
 
 export const generateCaseStudy = async (problem: string, solution: string, result: string): Promise<CaseStudyAssets> => {
   const ai = getAIClient();
   const prompt = `Turn this win into a short, simple story: ${problem}, ${solution}, ${result}. ${READABILITY_GUIDELINES}`;
-  const response = await ai.models.generateContent({
+  const response = await executeSafe(() => ai.models.generateContent({
     model: SMART_MODEL,
     contents: prompt,
     config: {
@@ -308,14 +374,14 @@ export const generateCaseStudy = async (problem: string, solution: string, resul
         required: ['caseStudy', 'storyTeaser']
       }
     }
-  });
+  }));
   return JSON.parse(response.text.trim());
 };
 
 export const fetchOptimizedJobDescription = async (role: string, industry: string): Promise<JobDescriptionAssets> => {
   const ai = getAIClient();
   const prompt = `Write a simple job description for a "${role}" in "${industry}". ${READABILITY_GUIDELINES} ${ROI_PROMPT_TEMPLATE}`;
-  const response = await ai.models.generateContent({
+  const response = await executeSafe(() => ai.models.generateContent({
     model: SMART_MODEL,
     contents: prompt,
     config: {
@@ -341,14 +407,14 @@ export const fetchOptimizedJobDescription = async (role: string, industry: strin
         required: ['jobDescription', 'requirements', 'interviewQuestions', 'roi']
       }
     }
-  });
+  }));
   return JSON.parse(response.text.trim());
 };
 
 export const generateJobPost = async (jt: string, cn: string, desc: string, loc: string, et: string, ad: string, hm: string): Promise<JobPostAssets> => {
   const ai = getAIClient();
   const prompt = `Write a friendly hiring post for a ${jt} at ${cn}. ${READABILITY_GUIDELINES}`;
-  const response = await ai.models.generateContent({
+  const response = await executeSafe(() => ai.models.generateContent({
     model: SMART_MODEL,
     contents: prompt,
     config: {
@@ -359,14 +425,14 @@ export const generateJobPost = async (jt: string, cn: string, desc: string, loc:
         required: ['jobDescription', 'linkedInPost']
       }
     }
-  });
+  }));
   return JSON.parse(response.text.trim());
 };
 
 export const generateNetworkingMessage = async (recipientRole: string, context: string, goal: string) => {
   const ai = getAIClient();
   const prompt = `Write two short, friendly messages for a ${recipientRole}. Goal: ${goal}. Context: ${context}. ${READABILITY_GUIDELINES}`;
-  const response = await ai.models.generateContent({
+  const response = await executeSafe(() => ai.models.generateContent({
     model: SMART_MODEL,
     contents: prompt,
     config: {
@@ -377,14 +443,14 @@ export const generateNetworkingMessage = async (recipientRole: string, context: 
         required: ['connectionRequest', 'followUp']
       }
     }
-  });
+  }));
   return JSON.parse(response.text.trim());
 };
 
 export const generateNewProfile = async (type: string, data: any) => {
   const ai = getAIClient();
   const prompt = `Build a new simple ${type} profile. ${READABILITY_GUIDELINES}`;
-  const response = await ai.models.generateContent({
+  const response = await executeSafe(() => ai.models.generateContent({
     model: PRO_THINKING_MODEL,
     contents: prompt,
     config: {
@@ -405,25 +471,25 @@ export const generateNewProfile = async (type: string, data: any) => {
         }
       }
     }
-  });
+  }));
   return JSON.parse(response.text.trim());
 };
 
 export const generateProfilePhoto = async (prompt: string) => {
   const ai = getAIClient();
-  const response = await ai.models.generateImages({ model: 'imagen-4.0-generate-001', prompt: `professional linkedin headshot, very friendly person, simple office background, ${prompt}` });
+  const response = await executeSafe(() => ai.models.generateImages({ model: 'imagen-4.0-generate-001', prompt: `professional linkedin headshot, very friendly person, simple office background, ${prompt}` }));
   return response.generatedImages[0].image.imageBytes;
 };
 
 export const generateBannerPhoto = async (industry: string, style: string) => {
   const ai = getAIClient();
-  const response = await ai.models.generateImages({ model: 'imagen-4.0-generate-001', prompt: `LinkedIn banner, ${industry}, simple and clean design, ${style}`, config: { aspectRatio: '3:1' } });
+  const response = await executeSafe(() => ai.models.generateImages({ model: 'imagen-4.0-generate-001', prompt: `LinkedIn banner, ${industry}, simple and clean design, ${style}`, config: { aspectRatio: '3:1' } }));
   return response.generatedImages[0].image.imageBytes;
 };
 
 export const editProfilePhoto = async (data: string, mime: string, prompt: string) => {
   const ai = getAIClient();
-  const response = await ai.models.generateContent({ model: 'gemini-2.5-flash-image', contents: { parts: [{ inlineData: { data, mimeType: mime } }, { text: `Please make this photo better: ${prompt}. Keep it simple and professional.` }] } });
+  const response = await executeSafe(() => ai.models.generateContent({ model: 'gemini-2.5-flash-image', contents: { parts: [{ inlineData: { data, mimeType: mime } }, { text: `Please make this photo better: ${prompt}. Keep it simple and professional.` }] } }));
   for (const p of response.candidates[0].content.parts) if (p.inlineData) return p.inlineData.data;
   throw new Error();
 };
