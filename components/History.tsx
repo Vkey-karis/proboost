@@ -27,6 +27,7 @@ const FEATURE_META: Record<FeatureName, { title: string; color: string; icon: Re
     [FeatureName.SavedJob]: { title: 'Saved', color: 'bg-rose-500', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg> },
     // Fix: Added missing FeatureName entries to satisfy Record<FeatureName, ...> type.
     [FeatureName.Settings]: { title: 'Settings', color: 'bg-slate-600', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> },
+    [FeatureName.Auth]: { title: 'System', color: 'bg-primary-500', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> },
 };
 
 const ProjectCard: React.FC<{ item: HistoryItem; onRename: (name: string) => void; onView: () => void; onDelete: () => void; }> = ({ item, onRename, onView, onDelete }) => {
@@ -54,16 +55,16 @@ const ProjectCard: React.FC<{ item: HistoryItem; onRename: (name: string) => voi
 
                 {isRenaming ? (
                     <div className="flex gap-2 mb-2">
-                        <Input 
-                            value={newName} 
-                            onChange={e => setNewName(e.target.value)} 
+                        <Input
+                            value={newName}
+                            onChange={e => setNewName(e.target.value)}
                             className="h-8 text-sm"
                             autoFocus
                         />
                         <button onClick={handleRenameSubmit} className="text-primary-600 font-bold text-xs">Save</button>
                     </div>
                 ) : (
-                    <h3 
+                    <h3
                         className="font-bold text-slate-900 dark:text-white leading-tight mb-2 line-clamp-2 hover:text-primary-600 cursor-pointer"
                         onClick={onView}
                     >
@@ -72,26 +73,26 @@ const ProjectCard: React.FC<{ item: HistoryItem; onRename: (name: string) => voi
                 )}
 
                 <div className="flex items-center gap-2 mt-auto pt-4 text-[10px] text-slate-400 font-medium">
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" strokeWidth={2}/></svg>
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" strokeWidth={2} /></svg>
                     {new Date(item.timestamp).toLocaleDateString()}
                 </div>
             </div>
 
             <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <div className="flex gap-1">
-                    <button 
+                    <button
                         onClick={() => setIsRenaming(true)}
                         className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md text-slate-400 transition-colors"
                         title="Rename Project"
                     >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" strokeWidth={2}/></svg>
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" strokeWidth={2} /></svg>
                     </button>
-                    <button 
+                    <button
                         onClick={onDelete}
                         className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-md text-slate-400 hover:text-red-500 transition-colors"
                         title="Delete Project"
                     >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1v3M4 7h16" strokeWidth={2}/></svg>
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1v3M4 7h16" strokeWidth={2} /></svg>
                     </button>
                 </div>
                 <Button variant="secondary" onClick={onView} className="h-7 text-[10px] px-3">Open Project</Button>
@@ -145,7 +146,7 @@ export const History: React.FC = () => {
                         ))}
                     </div>
                     {history.length > 0 && (
-                        <button 
+                        <button
                             onClick={() => confirm('Clear all projects?') && clearHistory()}
                             className="text-xs font-bold text-red-500 hover:underline px-4"
                         >
@@ -158,7 +159,7 @@ export const History: React.FC = () => {
             {filteredHistory.length === 0 ? (
                 <div className="text-center py-32 bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
                     <div className="bg-slate-50 dark:bg-slate-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-8 h-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" strokeWidth={2}/></svg>
+                        <svg className="w-8 h-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" strokeWidth={2} /></svg>
                     </div>
                     <h3 className="text-lg font-bold text-slate-800 dark:text-white">No projects found</h3>
                     <p className="text-slate-500 text-sm mt-1 max-w-xs mx-auto">
@@ -168,8 +169,8 @@ export const History: React.FC = () => {
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
                     {filteredHistory.map(item => (
-                        <ProjectCard 
-                            key={item.id} 
+                        <ProjectCard
+                            key={item.id}
                             item={item}
                             onRename={(name) => updateHistoryItem(item.id, { title: name })}
                             onView={() => setSelectedItem(item)}
