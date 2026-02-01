@@ -75,7 +75,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
                 setError(result.error || 'Failed to sign in with Google.');
                 setLoading(false);
             }
-            // OAuth redirect will happen automatically
+            // Note: OAuth will redirect to callback URL, user will be redirected automatically
         } catch (err) {
             setError('An unexpected error occurred.');
             setLoading(false);

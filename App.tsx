@@ -77,6 +77,18 @@ class ErrorBoundary extends React.Component<
 const App: React.FC = () => {
   const [activeFeature, setActiveFeature] = useState<FeatureName | null>(null);
 
+  // Handle OAuth callback redirect
+  useEffect(() => {
+    // Check if we have OAuth tokens in the URL hash (from Supabase OAuth redirect)
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token')) {
+      // Clear the hash from URL
+      window.history.replaceState(null, '', window.location.pathname);
+      // Navigate to dashboard
+      setActiveFeature(null);
+    }
+  }, []);
+
   // SEO: Dynamic Title Update
   useEffect(() => {
     let title = "ProBoost AI | Your Friendly Career Helper";
