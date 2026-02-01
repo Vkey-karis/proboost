@@ -2,7 +2,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Language, FeatureName } from '../types.ts';
-import { AuthModal } from './AuthModal.tsx';
 import { AuthService } from '../services/authService.ts';
 
 interface HeaderProps {
@@ -14,7 +13,6 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
   const { theme, toggleTheme, language, setLanguage, t, user } = useAppContext();
   const [langOpen, setLangOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -121,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
           <div className="flex items-center space-x-2 sm:space-x-4">
             {!user ? (
               <button
-                onClick={() => setIsAuthOpen(true)}
+                onClick={() => onSelectFeature(FeatureName.Auth)}
                 className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-primary-600 hover:text-primary-700 px-4 py-2"
                 aria-label="Sign In"
               >
@@ -234,7 +232,7 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
               Pricing & Plans
             </a>
             {!user ? (
-              <button onClick={() => setIsAuthOpen(true)} className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500">Sign In</button>
+              <button onClick={() => onSelectFeature(FeatureName.Auth)} className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500">Sign In</button>
             ) : (
               <>
                 <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 mt-2">
@@ -268,8 +266,6 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
           </div>
         </div>
       )}
-
-      {isAuthOpen && <AuthModal onClose={() => setIsAuthOpen(false)} onLoginSuccess={onBackToDashboard} />}
     </header>
   );
 };

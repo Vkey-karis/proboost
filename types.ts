@@ -2,54 +2,55 @@
 import React from 'react';
 
 export enum FeatureName {
-  ContentGenerator = 'ContentGenerator',
-  ProfileOptimizer = 'ProfileOptimizer',
-  ProfileCreator = 'ProfileCreator',
-  JobApplication = 'JobApplication',
-  CaseStudyWriter = 'CaseStudyWriter',
-  JobPostCreator = 'JobPostCreator',
-  NewsToPost = 'NewsToPost',
-  NetworkingAssistant = 'NetworkingAssistant',
-  History = 'History',
-  Resources = 'Resources',
-  Privacy = 'Privacy',
-  Terms = 'Terms',
-  JobSearch = 'JobSearch',
-  JobFetcher = 'JobFetcher',
-  InterviewPrep = 'InterviewPrep',
-  SavedJob = 'SavedJob',
-  Settings = 'Settings'
+    ContentGenerator = 'ContentGenerator',
+    ProfileOptimizer = 'ProfileOptimizer',
+    ProfileCreator = 'ProfileCreator',
+    JobApplication = 'JobApplication',
+    CaseStudyWriter = 'CaseStudyWriter',
+    JobPostCreator = 'JobPostCreator',
+    NewsToPost = 'NewsToPost',
+    NetworkingAssistant = 'NetworkingAssistant',
+    History = 'History',
+    Resources = 'Resources',
+    Privacy = 'Privacy',
+    Terms = 'Terms',
+    JobSearch = 'JobSearch',
+    JobFetcher = 'JobFetcher',
+    InterviewPrep = 'InterviewPrep',
+    SavedJob = 'SavedJob',
+    Settings = 'Settings',
+    Auth = 'Auth'
 }
 
 export type Language = 'en' | 'es' | 'fr' | 'de' | 'hi' | 'pt' | 'la' | 'ja' | 'ar' | 'zh' | 'ru' | 'it';
 export type Theme = 'light' | 'dark';
 
 export interface Feature {
-  name: FeatureName;
-  title: string;
-  description: string;
-  icon: React.ReactElement;
-  comingSoon?: boolean;
+    name: FeatureName;
+    title: string;
+    description: string;
+    icon: React.ReactElement;
+    comingSoon?: boolean;
 }
 
 export type Persona = 'Consultant' | 'Founder' | 'Student' | 'Marketer' | 'Developer' | 'Sales Professional' | 'Recruiter';
 
 export interface PostDraft {
-  tone: string;
-  postText: string;
-  hashtags: string[];
-  firstComment: string;
-  storyVersion: string;
+    tone: string;
+    postText: string;
+    hashtags: string[];
+    firstComment: string;
+    storyVersion: string;
 }
 
 export interface GroundingSource {
-  title: string;
-  uri: string;
+    title: string;
+    uri: string;
 }
 
 export interface TrendingPostResult {
-  posts: PostDraft[];
-  sources: GroundingSource[];
+    posts: PostDraft[];
+    sources: GroundingSource[];
 }
 
 export type GeneratedContent = PostDraft[];
@@ -57,12 +58,12 @@ export type GeneratedContent = PostDraft[];
 export type InputType = 'paste' | 'bullets' | 'prompt';
 
 export interface HistoryItem {
-  id: string;
-  title: string;
-  timestamp: number;
-  featureType: FeatureName;
-  input: any;
-  output: any;
+    id: string;
+    title: string;
+    timestamp: number;
+    featureType: FeatureName;
+    input: any;
+    output: any;
 }
 
 export interface OptimizedProfile {

@@ -22,6 +22,7 @@ const JobSearchTool = React.lazy(() => import('./components/JobSearchTool.tsx').
 const JobDescriptionFetcher = React.lazy(() => import('./components/JobDescriptionFetcher.tsx').then(module => ({ default: module.JobDescriptionFetcher })));
 const InterviewPrepTool = React.lazy(() => import('./components/InterviewPrepTool.tsx').then(module => ({ default: module.InterviewPrepTool })));
 const Settings = React.lazy(() => import('./components/Settings.tsx').then(module => ({ default: module.Settings })));
+const AuthPage = React.lazy(() => import('./components/AuthPage.tsx').then(module => ({ default: module.AuthPage })));
 
 // Enhanced Loading Fallback with Skeleton
 const LoadingFallback = () => (
@@ -89,6 +90,7 @@ const App: React.FC = () => {
         [FeatureName.Resources]: "Pricing & Plans | ProBoost AI",
         [FeatureName.Settings]: "Account Settings | ProBoost AI",
         [FeatureName.NewsToPost]: "News-to-Viral AI | ProBoost AI",
+        [FeatureName.Auth]: "Sign In | ProBoost AI",
       };
       title = titles[activeFeature] || `${activeFeature.replace(/([A-Z])/g, ' $1').trim()} | ProBoost AI`;
     }
@@ -129,6 +131,8 @@ const App: React.FC = () => {
         return <Legal type="privacy" />;
       case FeatureName.Terms:
         return <Legal type="terms" />;
+      case FeatureName.Auth:
+        return <AuthPage onBack={handleBackToDashboard} />;
       default:
         return <Dashboard onSelectFeature={setActiveFeature} />;
     }
