@@ -4,6 +4,7 @@ import { Header } from './components/Header.tsx';
 import { Footer } from './components/Footer.tsx';
 import { FeatureName } from './types.ts';
 import { SkeletonDashboard } from './components/common/SkeletonLoader.tsx';
+import { useAppContext } from './contexts/AppContext.tsx';
 
 // Lazy Load Components
 const Dashboard = React.lazy(() => import('./components/Dashboard.tsx').then(module => ({ default: module.Dashboard })));
@@ -76,6 +77,7 @@ class ErrorBoundary extends React.Component<
 
 const App: React.FC = () => {
   const [activeFeature, setActiveFeature] = useState<FeatureName | null>(null);
+  const { user } = useAppContext();
 
   // Handle OAuth callback redirect
   useEffect(() => {
@@ -84,10 +86,25 @@ const App: React.FC = () => {
     if (hash && hash.includes('access_token')) {
       // Clear the hash from URL
       window.history.replaceState(null, '', window.location.pathname);
-      // Navigate to dashboard
-      setActiveFeature(null);
+
+      // Wait a moment for Supabase to establish the session
+      // The AppContext will automatically detect the user via onAuthStateChange
+      setTimeout(() => {
+        // Navigate to dashboard (null = dashboard)
+        setActiveFeature(null);
+      }, 500);
     }
   }, []);
+
+  // Auto-redirect to dashboard when user logs in via OAuth
+  useEffect(() => {
+    // If we just came from OAuth (no active feature set) and user is now logged in
+    const hash = window.location.hash;
+    if (user && !activeFeature && hash.includes('access_token')) {
+      // User is authenticated, ensure we're on dashboard
+      setActiveFeature(null);
+    }
+  }, [user, activeFeature]);
 
   // SEO: Dynamic Title Update
   useEffect(() => {
