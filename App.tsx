@@ -84,24 +84,18 @@ const App: React.FC = () => {
     // Check if we have OAuth tokens in the URL hash (from Supabase OAuth redirect)
     const hash = window.location.hash;
     if (hash && hash.includes('access_token')) {
-      // Clear the hash from URL
+      // Clear the hash from URL immediately
       window.history.replaceState(null, '', window.location.pathname);
 
-      // Wait a moment for Supabase to establish the session
-      // The AppContext will automatically detect the user via onAuthStateChange
-      setTimeout(() => {
-        // Navigate to dashboard (null = dashboard)
-        setActiveFeature(null);
-      }, 500);
+      // Ensure we're on the dashboard (not Auth page)
+      setActiveFeature(null);
     }
   }, []);
 
-  // Auto-redirect to dashboard when user logs in via OAuth
+  // Auto-redirect logged-in users away from Auth page to dashboard
   useEffect(() => {
-    // If we just came from OAuth (no active feature set) and user is now logged in
-    const hash = window.location.hash;
-    if (user && !activeFeature && hash.includes('access_token')) {
-      // User is authenticated, ensure we're on dashboard
+    // If user is logged in and on Auth page, redirect to dashboard
+    if (user && activeFeature === FeatureName.Auth) {
       setActiveFeature(null);
     }
   }, [user, activeFeature]);
