@@ -24,6 +24,14 @@ export default defineConfig(({ mode }) => {
       sourcemap: false,
       minify: 'terser',
 
+      // Terser options for better compression
+      terserOptions: {
+        compress: {
+          drop_console: true, // Remove console.log in production
+          drop_debugger: true,
+        },
+      },
+
       // Optimize chunk splitting for better caching
       rollupOptions: {
         output: {
@@ -34,14 +42,33 @@ export default defineConfig(({ mode }) => {
             // AI/ML libraries
             genai: ['@google/genai'],
 
+            // Auth library
+            auth: ['@supabase/supabase-js'],
+
             // Document processing libraries
             documents: ['jspdf', 'docx', 'jszip', 'mammoth', 'pdfjs-dist']
-          }
+          },
+          // Optimize asset file names for better caching
+          assetFileNames: (assetInfo) => {
+            const info = assetInfo.name?.split('.');
+            const ext = info?.[info.length - 1];
+            if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext || '')) {
+              return `assets/images/[name]-[hash][extname]`;
+            } else if (/woff2?|ttf|otf|eot/i.test(ext || '')) {
+              return `assets/fonts/[name]-[hash][extname]`;
+            }
+            return `assets/[name]-[hash][extname]`;
+          },
+          chunkFileNames: 'assets/js/[name]-[hash].js',
+          entryFileNames: 'assets/js/[name]-[hash].js',
         }
       },
 
       // Increase chunk size warning limit (default is 500kb)
       chunkSizeWarningLimit: 1000,
+
+      // Enable CSS code splitting
+      cssCodeSplit: true,
     },
 
     // Development server configuration
@@ -53,6 +80,12 @@ export default defineConfig(({ mode }) => {
     // Preview server configuration
     preview: {
       port: 4173,
-    }
+    },
+
+    // Optimize dependencies
+    optimizeDeps: {
+      include: ['react', 'react-dom', '@google/genai', '@supabase/supabase-js'],
+      exclude: ['pdfjs-dist'], // Large library, load on demand
+    },
   };
 });

@@ -10,9 +10,15 @@
     <link rel="canonical" href="https://proboost-ai.com/" />
 
     <!-- Performance Hints -->
-    <link rel="preconnect" href="https://cdn.tailwindcss.com" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://aistudiocdn.com" />
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://aistudiocdn.com" crossorigin />
+    <link rel="dns-prefetch" href="https://aistudiocdn.com" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
 
     <!-- Primary SEO Meta Tags -->
     <meta name="title" content="ProBoost AI | Get Hired and Look Great on LinkedIn" />
@@ -59,7 +65,7 @@
     }
     </script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
     <script>
       tailwind.config = {
         darkMode: 'class',
@@ -67,11 +73,25 @@
           extend: {
             colors: {
               primary: { '50': '#eff6ff', '100': '#dbeafe', '200': '#bfdbfe', '300': '#93c5fd', '400': '#60a5fa', '500': '#3b82f6', '600': '#2563eb', '700': '#1d4ed8', '800': '#1e40af', '900': '#1e3a8a', '950': '#172554' }
+            },
+            fontFamily: {
+              sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
             }
           }
         }
       }
     </script>
+    <style>
+      /* Critical CSS for initial render */
+      body { font-display: swap; }
+      @font-face {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: local('Inter'), local('Inter-Regular');
+      }
+    </style>
   <script type="importmap">
 {
   "imports": {
