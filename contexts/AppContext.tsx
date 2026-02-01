@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Language, Theme } from '../types.ts';
 import { translations } from '../translations.ts';
+import { User } from '@supabase/supabase-js';
+import { AuthService } from '../services/authService.ts';
 
 interface AppContextType {
   language: Language;
@@ -9,6 +11,7 @@ interface AppContextType {
   theme: Theme;
   toggleTheme: () => void;
   t: (key: string) => string;
+  user: User | null;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -45,8 +48,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return translations[language][key] || key;
   };
 
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    // Check current session
+    AuthService.getCurrentUser().then(setUser);
+
+    // Subscribe to changes
+    const { data: { subscription } } = AuthService.onAuthStateChange(setUser);
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   return (
-    <AppContext.Provider value={{ language, setLanguage, theme, toggleTheme, t }}>
+    <AppContext.Provider value={{ language, setLanguage, theme, toggleTheme, t, user }}>
       {children}
     </AppContext.Provider>
   );

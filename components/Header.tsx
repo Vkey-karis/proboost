@@ -5,12 +5,12 @@ import { Language, FeatureName } from '../types.ts';
 import { AuthModal } from './AuthModal.tsx';
 
 interface HeaderProps {
-    onBackToDashboard: () => void;
-    onSelectFeature: (feature: FeatureName) => void;
+  onBackToDashboard: () => void;
+  onSelectFeature: (feature: FeatureName) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeature }) => {
-  const { theme, toggleTheme, language, setLanguage, t } = useAppContext();
+  const { theme, toggleTheme, language, setLanguage, t, user } = useAppContext();
   const [langOpen, setLangOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -35,10 +35,10 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
     onSelectFeature(FeatureName.Resources);
     setMobileMenuOpen(false);
     setTimeout(() => {
-        const el = document.getElementById(sectionId);
-        if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }, 150);
   };
 
@@ -68,15 +68,15 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-4 lg:space-x-8">
-            <div 
+            <div
               className="flex items-center space-x-2 cursor-pointer group"
               onClick={onBackToDashboard}
               role="button"
               aria-label="Home"
-              >
+            >
               <div className="bg-primary-600 p-1.5 rounded-lg group-hover:scale-110 transition-transform duration-300">
                 <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.311l-3.75 0M12 6.75l-3.75 3.75M12 6.75l3.75 3.75" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.311l-3.75 0M12 6.75l-3.75 3.75M12 6.75l3.75 3.75" />
                 </svg>
               </div>
               <h1 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight">
@@ -87,7 +87,7 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-6" aria-label="Main Navigation">
               {navItems.map(item => (
-                <a 
+                <a
                   key={item.id}
                   href={`#${item.id}`}
                   onClick={(e) => navigateToSection(e, item.id)}
@@ -97,7 +97,7 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
                 </a>
               ))}
               <div className="h-4 w-px bg-slate-200 dark:bg-slate-700" />
-              <a 
+              <a
                 href="#pricing"
                 onClick={(e) => { e.preventDefault(); onSelectFeature(FeatureName.Resources); }}
                 className="text-[10px] font-black text-slate-900 dark:text-white hover:text-primary-600 transition-colors uppercase tracking-widest"
@@ -108,16 +108,18 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <button 
+            {!user && (
+              <button
                 onClick={() => setIsAuthOpen(true)}
                 className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-primary-600 hover:text-primary-700 px-4 py-2"
                 aria-label="Sign In"
-            >
+              >
                 Sign In
-            </button>
+              </button>
+            )}
 
             {/* Theme Toggle */}
-            <button 
+            <button
               onClick={toggleTheme}
               className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-yellow-400 hover:scale-110 active:scale-95 transition-all duration-200"
               aria-label="Toggle Dark Mode"
@@ -130,7 +132,7 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
             </button>
 
             {/* Mobile Menu Button */}
-            <button 
+            <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 hover:text-primary-600 transition-colors"
               aria-expanded={mobileMenuOpen}
@@ -153,28 +155,30 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
         <div className="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 animate-in slide-in-from-top duration-300" ref={mobileMenuRef}>
           <div className="px-4 pt-2 pb-6 space-y-2">
             {navItems.map(item => (
-               <a 
+              <a
                 key={item.id}
                 href={`#${item.id}`}
                 onClick={(e) => navigateToSection(e, item.id)}
                 className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary-600 transition-colors"
-               >
-                 {item.label}
-               </a>
+              >
+                {item.label}
+              </a>
             ))}
-            <a 
-                href="#pricing"
-                onClick={(e) => { e.preventDefault(); onSelectFeature(FeatureName.Resources); setMobileMenuOpen(false); }}
-                className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-primary-600 bg-primary-50 dark:bg-primary-900/20"
+            <a
+              href="#pricing"
+              onClick={(e) => { e.preventDefault(); onSelectFeature(FeatureName.Resources); setMobileMenuOpen(false); }}
+              className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-primary-600 bg-primary-50 dark:bg-primary-900/20"
             >
               Pricing & Plans
             </a>
-            <button onClick={() => setIsAuthOpen(true)} className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500">Sign In</button>
+            {!user && (
+              <button onClick={() => setIsAuthOpen(true)} className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500">Sign In</button>
+            )}
           </div>
         </div>
       )}
 
-      {isAuthOpen && <AuthModal onClose={() => setIsAuthOpen(false)} />}
+      {isAuthOpen && <AuthModal onClose={() => setIsAuthOpen(false)} onLoginSuccess={onBackToDashboard} />}
     </header>
   );
 };
