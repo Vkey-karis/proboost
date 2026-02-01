@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Language, FeatureName } from '../types.ts';
 import { AuthModal } from './AuthModal.tsx';
+import { AuthService } from '../services/authService.ts';
 
 interface HeaderProps {
   onBackToDashboard: () => void;
@@ -14,8 +15,10 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
   const [langOpen, setLangOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -25,10 +28,18 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
         setMobileMenuOpen(false);
       }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleLogout = async () => {
+    await AuthService.signOut();
+    window.location.reload();
+  };
 
   const navigateToSection = (e: React.MouseEvent, sectionId: string) => {
     e.preventDefault();
@@ -108,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-4">
-            {!user && (
+            {!user ? (
               <button
                 onClick={() => setIsAuthOpen(true)}
                 className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-primary-600 hover:text-primary-700 px-4 py-2"
@@ -116,6 +127,57 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
               >
                 Sign In
               </button>
+            ) : (
+              <div className="relative" ref={profileRef}>
+                <button
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className="flex items-center space-x-2 p-1 pr-3 rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-700 dark:text-primary-400 font-bold text-xs">
+                    {user.email?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <span className="hidden md:block text-xs font-bold text-slate-700 dark:text-slate-200 max-w-[100px] truncate">
+                    {user.user_metadata?.full_name?.split(' ')[0] || 'User'}
+                  </span>
+                  <svg className={`w-4 h-4 text-slate-400 transition-transform ${profileOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Profile Dropdown */}
+                {profileOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 py-1 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Signed in as</p>
+                      <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{user.email}</p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        onSelectFeature(FeatureName.Settings);
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center"
+                    >
+                      <svg className="w-4 h-4 mr-2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      Settings
+                    </button>
+
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Theme Toggle */}
@@ -171,8 +233,37 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
             >
               Pricing & Plans
             </a>
-            {!user && (
+            {!user ? (
               <button onClick={() => setIsAuthOpen(true)} className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500">Sign In</button>
+            ) : (
+              <>
+                <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 mt-2">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xs">
+                      {user.email?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-900 dark:text-white">{user.user_metadata?.full_name || 'User'}</p>
+                      <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      onSelectFeature(FeatureName.Settings);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left py-2 text-sm font-medium text-slate-600 dark:text-slate-300"
+                  >
+                    Account Settings
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left py-2 text-sm font-medium text-red-600"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>

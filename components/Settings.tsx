@@ -3,7 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Button } from './common/Button.tsx';
 import { Input } from './common/Input.tsx';
 
+import { useAppContext } from '../contexts/AppContext.tsx';
+
 export const Settings: React.FC = () => {
+    const { user } = useAppContext();
     const [apiKey, setApiKey] = useState(() => localStorage.getItem('PROBOOST_USER_API_KEY') || '');
     const [tier, setTier] = useState('Authority'); // Simulated current tier
     const [saveStatus, setSaveStatus] = useState<string | null>(null);
@@ -29,8 +32,18 @@ export const Settings: React.FC = () => {
     return (
         <div className="max-w-4xl mx-auto space-y-12 py-12">
             <header>
-                <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900 dark:text-white mb-2">Account Settings</h1>
-                <p className="text-slate-500 font-medium">Manage your subscription, API keys, and partner earnings.</p>
+                <div className="flex items-center gap-4 mb-4">
+                    <div className="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-700 dark:text-primary-400 font-bold text-2xl">
+                        {user?.email?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                    <div>
+                        <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900 dark:text-white mb-1">
+                            {user?.user_metadata?.full_name || 'Account Settings'}
+                        </h1>
+                        <p className="text-slate-500 font-medium">{user?.email || 'Manage your preferences'}</p>
+                    </div>
+                </div>
+                <p className="text-slate-500 font-medium border-t border-slate-200 dark:border-slate-700 pt-6 mt-6">Manage your subscription, API keys, and partner earnings.</p>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -59,31 +72,31 @@ export const Settings: React.FC = () => {
                 <div className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700 shadow-xl">
                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Wallet & Payments</h3>
                     <div className="space-y-4">
-                         <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700">
-                             <div className="flex items-center gap-3">
-                                 <div className="w-8 h-8 bg-[#ffc439]/10 rounded-lg flex items-center justify-center">
-                                     <svg className="h-4 w-auto" viewBox="0 0 115 31" fill="none"><path d="M12.923 5.421c0-.44-.04-.844-.12-1.226C12.393 1.944 10.378 0 7.765 0H.841C.46 0 .147.266.046.611L.002.839.046.611 4.298 29.56c.03.204.22.355.434.355h6.39c.25 0 .463-.182.495-.414L12.923 5.42z" fill="#27346A"/></svg>
-                                 </div>
-                                 <div>
-                                     <p className="text-[10px] font-black uppercase text-slate-400">PayPal</p>
-                                     <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Linked Account</p>
-                                 </div>
-                             </div>
-                             <button onClick={() => handleManagePayment('PayPal')} className="text-[10px] font-black uppercase text-primary-600 hover:underline">Manage</button>
-                         </div>
+                        <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-[#ffc439]/10 rounded-lg flex items-center justify-center">
+                                    <svg className="h-4 w-auto" viewBox="0 0 115 31" fill="none"><path d="M12.923 5.421c0-.44-.04-.844-.12-1.226C12.393 1.944 10.378 0 7.765 0H.841C.46 0 .147.266.046.611L.002.839.046.611 4.298 29.56c.03.204.22.355.434.355h6.39c.25 0 .463-.182.495-.414L12.923 5.42z" fill="#27346A" /></svg>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase text-slate-400">PayPal</p>
+                                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Linked Account</p>
+                                </div>
+                            </div>
+                            <button onClick={() => handleManagePayment('PayPal')} className="text-[10px] font-black uppercase text-primary-600 hover:underline">Manage</button>
+                        </div>
 
-                         <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700">
-                             <div className="flex items-center gap-3">
-                                 <div className="w-8 h-8 bg-[#00d0e1]/10 rounded-lg flex items-center justify-center">
-                                     <div className="w-4 h-4 bg-[#00d0e1] rounded-full" />
-                                 </div>
-                                 <div>
-                                     <p className="text-[10px] font-black uppercase text-slate-400">Paystack</p>
-                                     <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Not Linked</p>
-                                 </div>
-                             </div>
-                             <button onClick={() => handleManagePayment('Paystack')} className="text-[10px] font-black uppercase text-primary-600 hover:underline">Connect</button>
-                         </div>
+                        <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-[#00d0e1]/10 rounded-lg flex items-center justify-center">
+                                    <div className="w-4 h-4 bg-[#00d0e1] rounded-full" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase text-slate-400">Paystack</p>
+                                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Not Linked</p>
+                                </div>
+                            </div>
+                            <button onClick={() => handleManagePayment('Paystack')} className="text-[10px] font-black uppercase text-primary-600 hover:underline">Connect</button>
+                        </div>
                     </div>
                 </div>
 
@@ -97,11 +110,11 @@ export const Settings: React.FC = () => {
                         Exceeded your token limit? Plug in your personal <strong>Gemini API Key</strong> to continue with infinite scale at wholesale costs.
                     </p>
                     <div className="space-y-4">
-                        <Input 
-                            type="password" 
-                            value={apiKey} 
-                            onChange={e => setApiKey(e.target.value)} 
-                            placeholder="Enter Gemini API Key..." 
+                        <Input
+                            type="password"
+                            value={apiKey}
+                            onChange={e => setApiKey(e.target.value)}
+                            placeholder="Enter Gemini API Key..."
                             className="bg-slate-50 dark:bg-slate-900 h-12"
                         />
                         <div className="flex gap-2">
@@ -127,31 +140,31 @@ export const Settings: React.FC = () => {
                             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-2">Available for Payout</p>
                         </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
-                         <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
-                             <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Total Referrals</p>
-                             <p className="text-2xl font-black">0</p>
-                         </div>
-                         <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
-                             <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Conversion Rate</p>
-                             <p className="text-2xl font-black">0%</p>
-                         </div>
-                         <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
-                             <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Partner Level</p>
-                             <p className="text-2xl font-black text-primary-400 italic">Bronze</p>
-                         </div>
+                        <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
+                            <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Total Referrals</p>
+                            <p className="text-2xl font-black">0</p>
+                        </div>
+                        <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
+                            <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Conversion Rate</p>
+                            <p className="text-2xl font-black">0%</p>
+                        </div>
+                        <div className="p-6 bg-white/5 rounded-3xl border border-white/10">
+                            <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Partner Level</p>
+                            <p className="text-2xl font-black text-primary-400 italic">Bronze</p>
+                        </div>
                     </div>
 
                     <div className="space-y-4">
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 pl-2">Your Partner Referral Link</label>
                         <div className="flex gap-4 p-2 bg-white/5 border border-white/10 rounded-2xl">
-                             <input 
-                                readOnly 
-                                value={`https://proboost.ai?ref=user_${Math.random().toString(36).substr(2, 6)}`} 
-                                className="bg-transparent border-none text-white flex-grow px-4 text-sm font-mono focus:ring-0" 
-                             />
-                             <Button className="h-10 px-8 text-[10px] font-black uppercase tracking-widest">Copy Link</Button>
+                            <input
+                                readOnly
+                                value={`https://proboost.ai?ref=user_${Math.random().toString(36).substr(2, 6)}`}
+                                className="bg-transparent border-none text-white flex-grow px-4 text-sm font-mono focus:ring-0"
+                            />
+                            <Button className="h-10 px-8 text-[10px] font-black uppercase tracking-widest">Copy Link</Button>
                         </div>
                     </div>
                 </div>
