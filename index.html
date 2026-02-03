@@ -10,8 +10,7 @@
   <link rel="canonical" href="https://proboost-ai.com/" />
 
   <!-- Performance Hints -->
-  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin />
-  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
@@ -69,37 +68,7 @@
     }
     </script>
 
-  <script src="https://cdn.tailwindcss.com" defer></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            primary: { '50': '#eff6ff', '100': '#dbeafe', '200': '#bfdbfe', '300': '#93c5fd', '400': '#60a5fa', '500': '#3b82f6', '600': '#2563eb', '700': '#1d4ed8', '800': '#1e40af', '900': '#1e3a8a', '950': '#172554' },
-            slate: { '850': '#151f32' }
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
-          },
-          animation: {
-            'fade-in': 'fadeIn 0.5s ease-out forwards',
-            'slide-up': 'slideUp 0.5s ease-out forwards',
-          },
-          keyframes: {
-            fadeIn: {
-              '0%': { opacity: '0' },
-              '100%': { opacity: '1' },
-            },
-            slideUp: {
-              '0%': { opacity: '0', transform: 'translateY(10px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
-            }
-          }
-        }
-      }
-    }
-  </script>
+
   <style>
     /* Critical CSS for initial render */
     body {
@@ -136,7 +105,7 @@
 
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
   <div id="root"></div>
-  <script type="module" src="index.tsx"></script>
+
   <script type="module" src="/index.tsx"></script>
 </body>
 
