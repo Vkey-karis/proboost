@@ -203,8 +203,8 @@ export const ContentGenerator: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 />
               </div>
 
-              <Button type="submit" disabled={isLoading || !inputText.trim()} className="w-full justify-center flex items-center gap-2">
-                {isLoading && <Spinner size="sm" />}
+              <Button type="submit" disabled={isLoading || !inputText.trim()} className="w-full h-14 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black uppercase tracking-widest rounded-xl shadow-lg hover:bg-slate-800 dark:hover:bg-slate-100 flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
+                {isLoading && <Spinner size="sm" className="text-white dark:text-slate-900" />}
                 {isLoading ? 'Generating...' : 'Generate Posts'}
               </Button>
 

@@ -110,8 +110,13 @@ export const InterviewPrepTool: React.FC<{ onBack: () => void }> = ({ onBack }) 
                             <p className="text-xs text-slate-400 mt-4 leading-relaxed font-medium">If you give me the name, I can find out more about them for you.</p>
                         </div>
                     </div>
-                    <Button type="submit" disabled={isLoading} className="w-full h-16 text-lg font-black uppercase tracking-widest shadow-2xl rounded-2xl bg-primary-600 hover:bg-primary-700 transform hover:-translate-y-1 transition-all">
-                        {isLoading ? <Spinner size="sm" className="text-white" /> : "Make my guide"}
+                    <Button type="submit" disabled={isLoading} className="w-full h-16 text-lg font-black uppercase tracking-widest shadow-2xl rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-3 group">
+                        {isLoading ? <Spinner size="sm" className="text-white dark:text-slate-900" /> : (
+                            <>
+                                <span>Make my guide</span>
+                                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                            </>
+                        )}
                     </Button>
                 </form>
             </div>

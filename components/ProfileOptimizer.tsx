@@ -299,8 +299,13 @@ ${optimizedContent.keywords.join(', ')}
                     </div>
 
                     <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-700">
-                        <Button type="submit" disabled={isLoading || !headline || !about} className="h-16 px-12 text-lg font-black uppercase tracking-widest shadow-2xl rounded-2xl transform transition-all hover:scale-[1.02] bg-primary-600 hover:bg-primary-700">
-                            {isLoading ? <div className="flex items-center gap-3"><Spinner size="sm" className="text-white" /> <span>Building Assets...</span></div> : 'Apply Changes & Optimize'}
+                        <Button type="submit" disabled={isLoading || !headline || !about} className="h-16 px-12 text-lg font-black uppercase tracking-widest shadow-2xl rounded-2xl transform transition-all hover:scale-[1.02] bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 flex items-center justify-center gap-3">
+                            {isLoading ? <div className="flex items-center gap-3"><Spinner size="sm" className="text-white dark:text-slate-900" /> <span>Building Assets...</span></div> : (
+                                <>
+                                    <span>Apply Changes & Optimize</span>
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                </>
+                            )}
                         </Button>
                     </div>
                     {error && <p className="text-center text-red-500 font-bold bg-red-50 p-4 rounded-xl border border-red-100">{error}</p>}
