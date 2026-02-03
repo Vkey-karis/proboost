@@ -215,16 +215,38 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
             )}
 
             {/* Theme Toggle */}
+            {/* Enhanced Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-yellow-400 hover:scale-110 active:scale-95 transition-all duration-200"
+              className="relative inline-flex h-9 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600"
+              role="switch"
+              aria-checked={theme === 'dark'}
               aria-label="Toggle Dark Mode"
             >
-              {theme === 'light' ? (
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-              ) : (
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.243 17.657l.707-.707M7.757 7.757l.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-              )}
+              <span className="sr-only">Use setting</span>
+              <span
+                className={`${theme === 'dark' ? 'translate-x-5 bg-slate-800' : 'translate-x-0 bg-white'
+                  } pointer-events-none relative inline-block h-8 w-8 transform rounded-full shadow ring-0 transition duration-200 ease-in-out flex items-center justify-center`}
+              >
+                <span
+                  className={`${theme === 'dark' ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in'
+                    } absolute inset-0 flex items-center justify-center transition-opacity`}
+                  aria-hidden="true"
+                >
+                  <svg className="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.243 17.657l.707-.707M7.757 7.757l.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </span>
+                <span
+                  className={`${theme === 'dark' ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out'
+                    } absolute inset-0 flex items-center justify-center transition-opacity`}
+                  aria-hidden="true"
+                >
+                  <svg className="h-5 w-5 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                </span>
+              </span>
             </button>
 
             {/* Mobile Menu Button */}
