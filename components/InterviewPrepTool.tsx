@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from './common/Button.tsx';
+import { BackButton } from './common/BackButton.tsx';
 import { Input } from './common/Input.tsx';
 import { Textarea } from './common/Textarea.tsx';
 import { Spinner } from './common/Spinner.tsx';
@@ -43,7 +44,7 @@ const ValueQuantifierCard: React.FC<{ roi: any }> = ({ roi }) => (
     </div>
 );
 
-export const InterviewPrepTool: React.FC = () => {
+export const InterviewPrepTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const [jobDetails, setJobDetails] = useState('');
     const [companyName, setCompanyName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -85,6 +86,7 @@ export const InterviewPrepTool: React.FC = () => {
 
     return (
         <div className="max-w-6xl mx-auto space-y-12 pb-20 px-4">
+            <BackButton onClick={onBack} />
             <div className="bg-white dark:bg-slate-800 p-10 rounded-[3rem] shadow-2xl border border-slate-100 dark:border-slate-700">
                 <div className="flex flex-col md:flex-row items-center gap-8 mb-12">
                     <div className="p-6 bg-primary-500 text-white rounded-[2rem] shadow-xl transform rotate-3">
@@ -99,13 +101,13 @@ export const InterviewPrepTool: React.FC = () => {
                 <form onSubmit={handleGenerate} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                         <div className="md:col-span-2 space-y-3">
-                             <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2">Job Description</label>
-                             <Textarea value={jobDetails} onChange={e => setJobDetails(e.target.value)} placeholder="Paste the job requirements here..." rows={6} className="rounded-3xl p-6" required />
+                            <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2">Job Description</label>
+                            <Textarea value={jobDetails} onChange={e => setJobDetails(e.target.value)} placeholder="Paste the job requirements here..." rows={6} className="rounded-3xl p-6" required />
                         </div>
                         <div className="space-y-3">
-                             <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2">Company Name</label>
-                             <Input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="e.g. Google, Stripe..." className="h-16 rounded-2xl px-6" />
-                             <p className="text-xs text-slate-400 mt-4 leading-relaxed font-medium">If you give me the name, I can find out more about them for you.</p>
+                            <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2">Company Name</label>
+                            <Input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="e.g. Google, Stripe..." className="h-16 rounded-2xl px-6" />
+                            <p className="text-xs text-slate-400 mt-4 leading-relaxed font-medium">If you give me the name, I can find out more about them for you.</p>
                         </div>
                     </div>
                     <Button type="submit" disabled={isLoading} className="w-full h-16 text-lg font-black uppercase tracking-widest shadow-2xl rounded-2xl bg-primary-600 hover:bg-primary-700 transform hover:-translate-y-1 transition-all">
@@ -138,7 +140,7 @@ export const InterviewPrepTool: React.FC = () => {
                             <section className="bg-white dark:bg-slate-800 rounded-[3rem] shadow-2xl overflow-visible border border-slate-100 dark:border-slate-700 group">
                                 <div className="p-8 bg-slate-50 dark:bg-slate-900/50 flex justify-between items-center rounded-t-[3rem] border-b border-slate-200 dark:border-slate-700">
                                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">My Advice</h3>
-                                    <ActionButtons textToCopy={result.strategicGuide || ''} downloadableText={result.strategicGuide || ''} downloadFilename="prep-strategy" onTranslate={(t) => setResult({...result, strategicGuide: t})} />
+                                    <ActionButtons textToCopy={result.strategicGuide || ''} downloadableText={result.strategicGuide || ''} downloadFilename="prep-strategy" onTranslate={(t) => setResult({ ...result, strategicGuide: t })} />
                                 </div>
                                 <div className="p-10">
                                     <p className="text-xl text-slate-700 dark:text-slate-300 leading-relaxed font-serif italic group-hover:text-slate-900 dark:group-hover:text-white transition-colors">"{result.strategicGuide || 'I am writing your guide now.'}"</p>
@@ -153,18 +155,18 @@ export const InterviewPrepTool: React.FC = () => {
                                     </h3>
                                     <span className="text-[10px] font-black uppercase bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 px-4 py-2 rounded-full border border-green-200">Just for you</span>
                                 </div>
-                                
+
                                 {questionsList.map((q, i) => (
                                     <div key={i} className="bg-white dark:bg-slate-800 p-10 rounded-[3rem] border border-slate-100 dark:border-slate-700 shadow-lg hover:shadow-2xl transition-all group overflow-hidden relative">
                                         <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-150 transition-transform duration-1000">
-                                            <span className="text-9xl font-black">{i+1}</span>
+                                            <span className="text-9xl font-black">{i + 1}</span>
                                         </div>
                                         <div className="flex justify-between items-start mb-8 relative z-10">
-                                            <div className="bg-primary-50 dark:bg-primary-900/30 w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl text-primary-600 border border-primary-100 dark:border-primary-700">{i+1}</div>
-                                            <ActionButtons textToCopy={`${q.question || ''}\n\nWHY THEY ASK:\n${q.whyTheyAsk || ''}\n\nHOW TO ANSWER:\n${q.howToAnswer || ''}`} downloadableText={`${q.question || ''}\n\n${q.whyTheyAsk || ''}\n\n${q.howToAnswer || ''}`} downloadFilename={`question-${i+1}`} layout="social" />
+                                            <div className="bg-primary-50 dark:bg-primary-900/30 w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl text-primary-600 border border-primary-100 dark:border-primary-700">{i + 1}</div>
+                                            <ActionButtons textToCopy={`${q.question || ''}\n\nWHY THEY ASK:\n${q.whyTheyAsk || ''}\n\nHOW TO ANSWER:\n${q.howToAnswer || ''}`} downloadableText={`${q.question || ''}\n\n${q.whyTheyAsk || ''}\n\n${q.howToAnswer || ''}`} downloadFilename={`question-${i + 1}`} layout="social" />
                                         </div>
                                         <h4 className="text-2xl font-black text-slate-900 dark:text-white mb-8 leading-tight relative z-10">{q.question || 'Loading question...'}</h4>
-                                        
+
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-10 border-t border-slate-50 dark:border-slate-700 relative z-10">
                                             <div>
                                                 <h5 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">What they really want to know</h5>
@@ -188,25 +190,25 @@ export const InterviewPrepTool: React.FC = () => {
                         </div>
 
                         <div className="space-y-8">
-                             <div className="bg-primary-600 text-white p-10 rounded-[3rem] shadow-2xl sticky top-24 transform hover:-rotate-1 transition-transform">
+                            <div className="bg-primary-600 text-white p-10 rounded-[3rem] shadow-2xl sticky top-24 transform hover:-rotate-1 transition-transform">
                                 <div className="flex items-center gap-4 mb-8">
-                                     <div className="p-2 bg-white/20 rounded-xl">
-                                         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                     </div>
-                                     <h3 className="text-sm font-black uppercase tracking-[0.2em] opacity-90">What I found</h3>
+                                    <div className="p-2 bg-white/20 rounded-xl">
+                                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </div>
+                                    <h3 className="text-sm font-black uppercase tracking-[0.2em] opacity-90">What I found</h3>
                                 </div>
                                 <p className="text-lg font-medium leading-relaxed italic border-l-4 border-white/30 pl-6 mb-10">
                                     {result.companyInsights || 'I found some really interesting things about this place. Here is the news...'}
                                 </p>
                                 <div className="pt-10 border-t border-white/10">
-                                     <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-6">Where I looked</p>
-                                     <div className="flex flex-wrap gap-3">
+                                    <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-6">Where I looked</p>
+                                    <div className="flex flex-wrap gap-3">
                                         {['Glassdoor', 'LinkedIn', 'Indeed', 'Reddit'].map(s => (
                                             <span key={s} className="px-4 py-2 bg-white/10 rounded-full border border-white/10 text-[9px] font-black uppercase tracking-tighter">{s}</span>
                                         ))}
-                                     </div>
+                                    </div>
                                 </div>
-                             </div>
+                            </div>
                         </div>
                     </div>
                 </div>

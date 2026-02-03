@@ -1,6 +1,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { Button } from './common/Button.tsx';
+import { BackButton } from './common/BackButton.tsx';
 import { Textarea } from './common/Textarea.tsx';
 import { Input } from './common/Input.tsx';
 import { Spinner } from './common/Spinner.tsx';
@@ -10,7 +11,7 @@ import { FeatureName, OptimizedProfile } from '../types.ts';
 import { ActionButtons } from './common/ActionButtons.tsx';
 import { downloadImage, downloadAsDocx } from '../utils/export.ts';
 
-const fileToBase64 = (file: File): Promise<{mimeType: string, data: string}> => {
+const fileToBase64 = (file: File): Promise<{ mimeType: string, data: string }> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -26,7 +27,7 @@ const fileToBase64 = (file: File): Promise<{mimeType: string, data: string}> => 
 
 const ProfileField: React.FC<{ label: string; content: string | string[]; original?: boolean }> = ({ label, content, original = false }) => {
     const [copied, setCopied] = useState(false);
-    
+
     const handleCopy = () => {
         const text = Array.isArray(content) ? content.join(', ') : content;
         navigator.clipboard.writeText(text);
@@ -35,22 +36,22 @@ const ProfileField: React.FC<{ label: string; content: string | string[]; origin
     };
 
     return (
-      <div className="mb-4">
-          <div className="flex justify-between items-end mb-1">
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{label}</h4>
-            {!original && content && (
-              <button 
-                onClick={handleCopy}
-                className="text-[10px] font-bold uppercase tracking-wider text-primary-600 dark:text-primary-400 hover:text-primary-800 transition-colors"
-              >
-                {copied ? 'Copied!' : 'Copy'}
-              </button>
-            )}
-          </div>
-          <div className={`p-4 rounded-xl min-h-[50px] text-sm leading-relaxed whitespace-pre-wrap ${original ? 'bg-slate-50 dark:bg-slate-900/50 text-slate-500' : 'bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-800/50 text-slate-700 dark:text-slate-200 shadow-inner'}`}>
-              {Array.isArray(content) ? content.join(', ') : (content || 'No content generated.')}
-          </div>
-      </div>
+        <div className="mb-4">
+            <div className="flex justify-between items-end mb-1">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{label}</h4>
+                {!original && content && (
+                    <button
+                        onClick={handleCopy}
+                        className="text-[10px] font-bold uppercase tracking-wider text-primary-600 dark:text-primary-400 hover:text-primary-800 transition-colors"
+                    >
+                        {copied ? 'Copied!' : 'Copy'}
+                    </button>
+                )}
+            </div>
+            <div className={`p-4 rounded-xl min-h-[50px] text-sm leading-relaxed whitespace-pre-wrap ${original ? 'bg-slate-50 dark:bg-slate-900/50 text-slate-500' : 'bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-800/50 text-slate-700 dark:text-slate-200 shadow-inner'}`}>
+                {Array.isArray(content) ? content.join(', ') : (content || 'No content generated.')}
+            </div>
+        </div>
     );
 };
 
@@ -65,15 +66,15 @@ const InputTypeTab: React.FC<{ active: boolean; onClick: () => void; children: R
     const baseClasses = "px-4 py-1.5 text-xs font-bold uppercase tracking-widest rounded-t-lg border-b-2 transition-colors";
     const activeClasses = "border-primary-500 text-primary-600 dark:text-primary-400";
     const inactiveClasses = "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300";
-    
+
     return (
-      <button type="button" onClick={onClick} className={`${baseClasses} ${active ? activeClasses : inactiveClasses}`}>
-        {children}
-      </button>
+        <button type="button" onClick={onClick} className={`${baseClasses} ${active ? activeClasses : inactiveClasses}`}>
+            {children}
+        </button>
     );
 };
 
-export const ProfileOptimizer: React.FC = () => {
+export const ProfileOptimizer: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const [headline, setHeadline] = useState('');
     const [about, setAbout] = useState('');
     const [aboutInputType, setAboutInputType] = useState<'text' | 'bullets'>('text');
@@ -120,7 +121,7 @@ export const ProfileOptimizer: React.FC = () => {
     };
 
     const togglePreset = (id: string) => {
-        setSelectedPresets(prev => 
+        setSelectedPresets(prev =>
             prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
         );
     };
@@ -156,7 +157,7 @@ export const ProfileOptimizer: React.FC = () => {
             const results = await Promise.all(promises);
             const textResults = results[0] as OptimizedProfile;
             setOptimizedContent(textResults);
-            
+
             if (results.length > 1) {
                 setEditedPhoto(`data:image/jpeg;base64,${results[1]}`);
             }
@@ -200,11 +201,12 @@ ${optimizedContent.keywords.join(', ')}
 
     return (
         <div className="max-w-7xl mx-auto space-y-12 pb-20">
+            <BackButton onClick={onBack} />
             <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700">
                 <form onSubmit={handleSubmit} className="space-y-10">
                     {/* Visual Studio UI */}
                     <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-inner">
-                         <div className="flex items-center gap-4 mb-8">
+                        <div className="flex items-center gap-4 mb-8">
                             <div className="p-3 bg-primary-100 dark:bg-primary-900/40 rounded-2xl">
                                 <svg className="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                             </div>
@@ -212,10 +214,10 @@ ${optimizedContent.keywords.join(', ')}
                                 <h3 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Studio AI Headshot Assistant</h3>
                                 <p className="text-slate-500 font-medium">Transform a selfie or generate a brand new professional image.</p>
                             </div>
-                         </div>
+                        </div>
 
-                         <div className="flex flex-col lg:flex-row gap-10 items-start">
-                             <div className="flex-shrink-0 w-full lg:w-56 space-y-4">
+                        <div className="flex flex-col lg:flex-row gap-10 items-start">
+                            <div className="flex-shrink-0 w-full lg:w-56 space-y-4">
                                 <div className="flex bg-slate-200 dark:bg-slate-800 p-1 rounded-xl shadow-sm">
                                     <button type="button" onClick={() => setPhotoMode('upload')} className={`flex-1 text-[11px] font-black uppercase py-3 rounded-lg transition-all ${photoMode === 'upload' ? 'bg-white text-primary-600 shadow-md' : 'text-slate-500'}`}>Upload</button>
                                     <button type="button" onClick={() => setPhotoMode('generate')} className={`flex-1 text-[11px] font-black uppercase py-3 rounded-lg transition-all ${photoMode === 'generate' ? 'bg-white text-primary-600 shadow-md' : 'text-slate-500'}`}>Generate</button>
@@ -224,9 +226,9 @@ ${optimizedContent.keywords.join(', ')}
                                     {photoPreview ? <img src={photoPreview} className="w-full h-full object-cover" /> : <div className="flex flex-col items-center justify-center h-full p-4"><div className="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mb-2"><svg className="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 4v16m8-8H4" strokeWidth={2.5} /></svg></div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No Image Selected</span></div>}
                                     <input type="file" id="photo-input" className="hidden" accept="image/*" onChange={handlePhotoUpload} />
                                 </div>
-                             </div>
+                            </div>
 
-                             <div className="flex-grow w-full space-y-8">
+                            <div className="flex-grow w-full space-y-8">
                                 {photoMode === 'generate' ? (
                                     <div className="space-y-4">
                                         <Textarea value={photoGenPrompt} onChange={e => setPhotoGenPrompt(e.target.value)} placeholder="e.g., Professional corporate portrait of a woman in a grey blazer, soft blurred background..." rows={3} className="bg-white" />
@@ -253,8 +255,8 @@ ${optimizedContent.keywords.join(', ')}
                                     </div>
                                 )}
                                 <p className="text-[9px] font-bold text-slate-400 tracking-[0.1em] uppercase">Powered by Gemini Visual Intelligence</p>
-                             </div>
-                         </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Text Optimization Section */}
@@ -279,11 +281,11 @@ ${optimizedContent.keywords.join(', ')}
                                     <InputTypeTab active={aboutInputType === 'bullets'} onClick={() => setAboutInputType('bullets')}>Bulleted List</InputTypeTab>
                                 </div>
                             </div>
-                            <Textarea 
-                                rows={6} 
-                                value={about} 
-                                onChange={e => setAbout(e.target.value)} 
-                                placeholder={aboutInputType === 'bullets' ? "Enter achievements as bullet points:\n- Managed a team of 10 developers\n- Reduced infrastructure costs by 25%\n- Orchestrated the launch of 'Product X'" : "Paste your current profile intro here..."} 
+                            <Textarea
+                                rows={6}
+                                value={about}
+                                onChange={e => setAbout(e.target.value)}
+                                placeholder={aboutInputType === 'bullets' ? "Enter achievements as bullet points:\n- Managed a team of 10 developers\n- Reduced infrastructure costs by 25%\n- Orchestrated the launch of 'Product X'" : "Paste your current profile intro here..."}
                             />
                         </div>
                         <div>
@@ -307,7 +309,7 @@ ${optimizedContent.keywords.join(', ')}
 
             {optimizedContent && (
                 <div className="animate-fade-in space-y-10">
-                     <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-primary-100">
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-primary-100">
                         <div className="p-8 bg-primary-600 text-white flex justify-between items-center">
                             <div>
                                 <h3 className="text-xl font-black uppercase tracking-widest">Optimized Assets</h3>
@@ -319,12 +321,12 @@ ${optimizedContent.keywords.join(', ')}
                             </div>
                         </div>
                         <div className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
-                             <div className="space-y-4">
+                            <div className="space-y-4">
                                 <ProfileField label="Optimized Headline" content={optimizedContent.headline} />
                                 <ProfileField label="Optimized About" content={optimizedContent.about} />
                                 <ProfileField label="Refined Education" content={optimizedContent.optimizedEducation} />
                                 <ProfileField label="Strategized Skills" content={optimizedContent.optimizedSkills} />
-                                
+
                                 <div className="pt-6">
                                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">SEO Keyword Cloud</h4>
                                     <div className="flex flex-wrap gap-2">
@@ -333,9 +335,9 @@ ${optimizedContent.keywords.join(', ')}
                                         ))}
                                     </div>
                                 </div>
-                             </div>
+                            </div>
 
-                             <div className="space-y-8 flex flex-col">
+                            <div className="space-y-8 flex flex-col">
                                 <div className="bg-primary-50 dark:bg-primary-900/10 p-8 rounded-3xl border border-primary-100 dark:border-primary-800 flex-grow relative">
                                     <h4 className="text-[10px] font-black uppercase text-primary-600 mb-3 tracking-[0.2em]">Elevator Pitch</h4>
                                     <p className="text-slate-700 dark:text-slate-300 italic font-serif text-lg leading-relaxed">"{optimizedContent.elevatorPitch}"</p>
@@ -354,7 +356,7 @@ ${optimizedContent.keywords.join(', ')}
                                             </div>
                                         </div>
                                         <div>
-                                            <button 
+                                            <button
                                                 onClick={() => downloadImage(editedPhoto!, 'enhanced-headshot')}
                                                 className="text-primary-600 dark:text-primary-400 font-black uppercase text-[10px] tracking-widest hover:underline flex items-center gap-1 mx-auto"
                                             >
@@ -363,9 +365,9 @@ ${optimizedContent.keywords.join(', ')}
                                         </div>
                                     </div>
                                 )}
-                             </div>
+                            </div>
                         </div>
-                     </div>
+                    </div>
                 </div>
             )}
         </div>

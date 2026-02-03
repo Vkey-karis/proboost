@@ -123,15 +123,15 @@ const App: React.FC = () => {
   const renderActiveFeature = () => {
     switch (activeFeature) {
       case FeatureName.InterviewPrep:
-        return <InterviewPrepTool />;
+        return <InterviewPrepTool onBack={handleBackToDashboard} />;
       case FeatureName.JobSearch:
-        return <JobSearchTool />;
+        return <JobSearchTool onBack={handleBackToDashboard} />;
       case FeatureName.JobFetcher:
         return <JobDescriptionFetcher />;
       case FeatureName.ContentGenerator:
-        return <ContentGenerator />;
+        return <ContentGenerator onBack={handleBackToDashboard} />;
       case FeatureName.ProfileOptimizer:
-        return <ProfileOptimizer />;
+        return <ProfileOptimizer onBack={handleBackToDashboard} />;
       case FeatureName.ProfileCreator:
         return <ProfileCreator />;
       case FeatureName.JobApplication:
