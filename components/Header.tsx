@@ -12,7 +12,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeature }) => {
   const { theme, toggleTheme, language, setLanguage, t, user } = useAppContext();
-  const { credits } = useCredits(); // Fetch credits on mount via hook implementation logic
+  const { credits, isTrialActive } = useCredits(); // Fetch credits on mount via hook implementation logic
   const [langOpen, setLangOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -133,10 +133,18 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
                 <div className="hidden md:flex flex-col items-end cursor-pointer group" onClick={() => onSelectFeature(FeatureName.Resources)}>
                   <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-primary-500 transition-colors">Credits</span>
                   <div className="flex items-center gap-1">
-                    <span className={`text-sm font-black ${credits !== null && credits < 10 ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>
-                      {credits !== null ? credits : '-'}
-                    </span>
-                    <svg className="w-3 h-3 text-primary-500" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" /></svg>
+                    {isTrialActive ? (
+                      <span className="text-sm font-black text-green-500 animate-pulse">
+                        Free Trial
+                      </span>
+                    ) : (
+                      <>
+                        <span className={`text-sm font-black ${credits !== null && credits < 10 ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>
+                          {credits !== null ? credits : '-'}
+                        </span>
+                        <svg className="w-3 h-3 text-primary-500" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" /></svg>
+                      </>
+                    )}
                   </div>
                 </div>
 

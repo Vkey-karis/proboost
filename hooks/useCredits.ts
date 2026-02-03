@@ -31,12 +31,25 @@ export const useCredits = () => {
         }
     }, [user, fetchCredits]);
 
+    const isTrialActive = useCallback(() => {
+        if (!user || !user.created_at) return false;
+        const createdAt = new Date(user.created_at).getTime();
+        const now = Date.now();
+        const twentyFourHours = 24 * 60 * 60 * 1000;
+        return (now - createdAt) < twentyFourHours;
+    }, [user]);
+
     const checkCredits = useCallback((cost: number): boolean => {
+        if (isTrialActive()) return true;
         return (credits || 0) >= cost;
-    }, [credits]);
+    }, [credits, isTrialActive]);
 
     const deductCredits = useCallback(async (cost: number): Promise<boolean> => {
         if (!user) return false;
+
+        if (isTrialActive()) {
+            return true; // Free trial, no deduction
+        }
 
         setLoading(true);
         try {
@@ -61,13 +74,14 @@ export const useCredits = () => {
         } finally {
             setLoading(false);
         }
-    }, [user, credits, setCredits]);
+    }, [user, credits, setCredits, isTrialActive]);
 
     return {
         credits,
         loading,
         fetchCredits,
         checkCredits,
-        deductCredits
+        deductCredits,
+        isTrialActive: isTrialActive()
     };
 };
