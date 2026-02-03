@@ -203,96 +203,97 @@ export const Header: React.FC<HeaderProps> = ({ onBackToDashboard, onSelectFeatu
                     </div>
                   )}
                 </div>
+              </div>
             )}
 
-                {/* Theme Toggle */}
-                <button
-                  onClick={toggleTheme}
-                  className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-yellow-400 hover:scale-110 active:scale-95 transition-all duration-200"
-                  aria-label="Toggle Dark Mode"
-                >
-                  {theme === 'light' ? (
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-                  ) : (
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.243 17.657l.707-.707M7.757 7.757l.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                  )}
-                </button>
-
-                {/* Mobile Menu Button */}
-                <button
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="lg:hidden p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 hover:text-primary-600 transition-colors"
-                  aria-expanded={mobileMenuOpen}
-                  aria-label="Open Menu"
-                >
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    {mobileMenuOpen ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-                    )}
-                  </svg>
-                </button>
-              </div>
-        </div>
-        </div>
-
-        {/* Mobile Menu Drawer */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 animate-in slide-in-from-top duration-300" ref={mobileMenuRef}>
-            <div className="px-4 pt-2 pb-6 space-y-2">
-              {navItems.map(item => (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  onClick={(e) => navigateToSection(e, item.id)}
-                  className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary-600 transition-colors"
-                >
-                  {item.label}
-                </a>
-              ))}
-              <a
-                href="#pricing"
-                onClick={(e) => { e.preventDefault(); onSelectFeature(FeatureName.Resources); setMobileMenuOpen(false); }}
-                className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-primary-600 bg-primary-50 dark:bg-primary-900/20"
-              >
-                Pricing & Plans
-              </a>
-              {!user ? (
-                <button onClick={() => onSelectFeature(FeatureName.Auth)} className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500">Sign In</button>
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-yellow-400 hover:scale-110 active:scale-95 transition-all duration-200"
+              aria-label="Toggle Dark Mode"
+            >
+              {theme === 'light' ? (
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
               ) : (
-                <>
-                  <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 mt-2">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xs">
-                        {user.email?.charAt(0).toUpperCase() || 'U'}
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-900 dark:text-white">{user.user_metadata?.full_name || 'User'}</p>
-                        <p className="text-xs text-slate-500 truncate">{user.email}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        onSelectFeature(FeatureName.Settings);
-                        setMobileMenuOpen(false);
-                      }}
-                      className="block w-full text-left py-2 text-sm font-medium text-slate-600 dark:text-slate-300"
-                    >
-                      Account Settings
-                    </button>
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-left py-2 text-sm font-medium text-red-600"
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                </>
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.243 17.657l.707-.707M7.757 7.757l.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
               )}
-            </div>
+            </button>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 hover:text-primary-600 transition-colors"
+              aria-expanded={mobileMenuOpen}
+              aria-label="Open Menu"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {mobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+                )}
+              </svg>
+            </button>
           </div>
-        )}
+        </div>
+      </div>
+
+      {/* Mobile Menu Drawer */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 animate-in slide-in-from-top duration-300" ref={mobileMenuRef}>
+          <div className="px-4 pt-2 pb-6 space-y-2">
+            {navItems.map(item => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                onClick={(e) => navigateToSection(e, item.id)}
+                className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary-600 transition-colors"
+              >
+                {item.label}
+              </a>
+            ))}
+            <a
+              href="#pricing"
+              onClick={(e) => { e.preventDefault(); onSelectFeature(FeatureName.Resources); setMobileMenuOpen(false); }}
+              className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-primary-600 bg-primary-50 dark:bg-primary-900/20"
+            >
+              Pricing & Plans
+            </a>
+            {!user ? (
+              <button onClick={() => onSelectFeature(FeatureName.Auth)} className="block w-full text-left px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500">Sign In</button>
+            ) : (
+              <>
+                <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 mt-2">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-xs">
+                      {user.email?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-900 dark:text-white">{user.user_metadata?.full_name || 'User'}</p>
+                      <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      onSelectFeature(FeatureName.Settings);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left py-2 text-sm font-medium text-slate-600 dark:text-slate-300"
+                  >
+                    Account Settings
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left py-2 text-sm font-medium text-red-600"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 };

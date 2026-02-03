@@ -1,5 +1,6 @@
 
 import React, { useState, useCallback, useEffect, Suspense } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Header } from './components/Header.tsx';
 import { Footer } from './components/Footer.tsx';
 import { FeatureName } from './types.ts';
@@ -100,10 +101,6 @@ const App: React.FC = () => {
     }
   }, [user, activeFeature]);
 
-  import { Helmet } from 'react-helmet-async';
-
-  // ...
-
   const getPageMeta = (feature: FeatureName | null) => {
     if (!feature) {
       return {
@@ -117,6 +114,9 @@ const App: React.FC = () => {
       [FeatureName.ProfileOptimizer]: { title: "LinkedIn Profile Optimizer | ProBoost", description: "Turn your profile into a recruiter magnet with AI-optimized headlines and bios." },
       [FeatureName.ContentGenerator]: { title: "AI LinkedIn Post Generator | ProBoost", description: "Write viral LinkedIn posts in seconds. Build your personal brand on autopilot." },
       [FeatureName.Resources]: { title: "Pricing & Plans | ProBoost", description: "Start for free. Affordable plans to boost your career search." },
+      [FeatureName.Settings]: { title: "Account Settings | ProBoost", description: "Manage your account settings and preferences." },
+      [FeatureName.Auth]: { title: "Sign In | ProBoost", description: "Sign in to access your AI career tools." },
+      [FeatureName.History]: { title: "Project History | ProBoost", description: "View your past interview guides, job searches, and optimized profiles." },
     };
     return map[feature] || { title: "ProBoost AI", description: "Your friendly AI career career." };
   };
@@ -136,6 +136,51 @@ const App: React.FC = () => {
       "priceCurrency": "USD"
     },
     "description": "AI-powered career toolkit for job seekers."
+  };
+
+  const handleBackToDashboard = useCallback(() => {
+    setActiveFeature(null);
+  }, []);
+
+  const renderActiveFeature = () => {
+    switch (activeFeature) {
+      case FeatureName.InterviewPrep:
+        return <InterviewPrepTool onBack={handleBackToDashboard} />;
+      case FeatureName.JobSearch:
+        return <JobSearchTool onBack={handleBackToDashboard} />;
+      case FeatureName.JobFetcher:
+        return <JobDescriptionFetcher />;
+      case FeatureName.ContentGenerator:
+        return <ContentGenerator onBack={handleBackToDashboard} />;
+      case FeatureName.ProfileOptimizer:
+        return <ProfileOptimizer onBack={handleBackToDashboard} />;
+      case FeatureName.ProfileCreator:
+        return <ProfileCreator />;
+      case FeatureName.JobApplication:
+        return <ApplicationAssistant />;
+      case FeatureName.CaseStudyWriter:
+        return <CaseStudyWriter />;
+      case FeatureName.JobPostCreator:
+        return <JobPostCreator />;
+      case FeatureName.NewsToPost:
+        return <NewsToPost />;
+      case FeatureName.NetworkingAssistant:
+        return <NetworkingAssistant />;
+      case FeatureName.History:
+        return <History onBack={handleBackToDashboard} />;
+      case FeatureName.Resources:
+        return <Resources onSelectFeature={setActiveFeature} onBack={handleBackToDashboard} />;
+      case FeatureName.Settings:
+        return <Settings />;
+      case FeatureName.Privacy:
+        return <Legal type="privacy" />;
+      case FeatureName.Terms:
+        return <Legal type="terms" />;
+      case FeatureName.Auth:
+        return <AuthPage onBack={handleBackToDashboard} />;
+      default:
+        return <Dashboard onSelectFeature={setActiveFeature} />;
+    }
   };
 
   return (
