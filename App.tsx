@@ -100,73 +100,55 @@ const App: React.FC = () => {
     }
   }, [user, activeFeature]);
 
-  // SEO: Dynamic Title Update
-  useEffect(() => {
-    let title = "ProBoost AI | Your Friendly Career Helper";
-    if (activeFeature) {
-      // Simple mapping for SEO titles
-      const titles: Partial<Record<FeatureName, string>> = {
-        [FeatureName.InterviewPrep]: "Interview Prep Pro | ProBoost AI",
-        [FeatureName.JobSearch]: "Live Job Search | ProBoost AI",
-        [FeatureName.ProfileOptimizer]: "LinkedIn SEO Optimizer | ProBoost AI",
-        [FeatureName.JobApplication]: "ATS Resume Helper | ProBoost AI",
-        [FeatureName.Resources]: "Pricing & Plans | ProBoost AI",
-        [FeatureName.Settings]: "Account Settings | ProBoost AI",
-        [FeatureName.NewsToPost]: "News-to-Viral AI | ProBoost AI",
-        [FeatureName.Auth]: "Sign In | ProBoost AI",
-      };
-      title = titles[activeFeature] || `${activeFeature.replace(/([A-Z])/g, ' $1').trim()} | ProBoost AI`;
-    }
-    document.title = title;
-  }, [activeFeature]);
+  import { Helmet } from 'react-helmet-async';
 
-  const renderActiveFeature = () => {
-    switch (activeFeature) {
-      case FeatureName.InterviewPrep:
-        return <InterviewPrepTool onBack={handleBackToDashboard} />;
-      case FeatureName.JobSearch:
-        return <JobSearchTool onBack={handleBackToDashboard} />;
-      case FeatureName.JobFetcher:
-        return <JobDescriptionFetcher />;
-      case FeatureName.ContentGenerator:
-        return <ContentGenerator onBack={handleBackToDashboard} />;
-      case FeatureName.ProfileOptimizer:
-        return <ProfileOptimizer onBack={handleBackToDashboard} />;
-      case FeatureName.ProfileCreator:
-        return <ProfileCreator />;
-      case FeatureName.JobApplication:
-        return <ApplicationAssistant />;
-      case FeatureName.CaseStudyWriter:
-        return <CaseStudyWriter />;
-      case FeatureName.JobPostCreator:
-        return <JobPostCreator />;
-      case FeatureName.NewsToPost:
-        return <NewsToPost />;
-      case FeatureName.NetworkingAssistant:
-        return <NetworkingAssistant />;
-      case FeatureName.History:
-        return <History />;
-      case FeatureName.Resources:
-        return <Resources onSelectFeature={setActiveFeature} />;
-      case FeatureName.Settings:
-        return <Settings />;
-      case FeatureName.Privacy:
-        return <Legal type="privacy" />;
-      case FeatureName.Terms:
-        return <Legal type="terms" />;
-      case FeatureName.Auth:
-        return <AuthPage onBack={handleBackToDashboard} />;
-      default:
-        return <Dashboard onSelectFeature={setActiveFeature} />;
+  // ...
+
+  const getPageMeta = (feature: FeatureName | null) => {
+    if (!feature) {
+      return {
+        title: "ProBoost AI | Your Friendly Career Helper",
+        description: "ProBoost AI finds you jobs 10x faster, writes your CV, and helps you prep for interviews. It's your unfair career advantage."
+      };
     }
+    const map: Partial<Record<FeatureName, { title: string, description: string }>> = {
+      [FeatureName.InterviewPrep]: { title: "AI Interview Coach | ProBoost", description: "Practice for your interview with AI. Get custom answers, strategy, and company insights." },
+      [FeatureName.JobSearch]: { title: "Live AI Job Search | ProBoost", description: "Find hidden jobs before they hit LinkedIn. AI scans thousands of boards for you." },
+      [FeatureName.ProfileOptimizer]: { title: "LinkedIn Profile Optimizer | ProBoost", description: "Turn your profile into a recruiter magnet with AI-optimized headlines and bios." },
+      [FeatureName.ContentGenerator]: { title: "AI LinkedIn Post Generator | ProBoost", description: "Write viral LinkedIn posts in seconds. Build your personal brand on autopilot." },
+      [FeatureName.Resources]: { title: "Pricing & Plans | ProBoost", description: "Start for free. Affordable plans to boost your career search." },
+    };
+    return map[feature] || { title: "ProBoost AI", description: "Your friendly AI career career." };
   };
 
-  const handleBackToDashboard = useCallback(() => {
-    setActiveFeature(null);
-  }, []);
+  const meta = getPageMeta(activeFeature);
+
+  // Schema.org Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ProBoost AI",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "AI-powered career toolkit for job seekers."
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+      <Helmet>
+        <title>{meta.title}</title>
+        <meta name="description" content={meta.description} />
+        <meta property="og:title" content={meta.title} />
+        <meta property="og:description" content={meta.description} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      </Helmet>
       <Header onBackToDashboard={handleBackToDashboard} onSelectFeature={setActiveFeature} />
       <main className="flex-grow p-4 sm:p-6 lg:p-8">
         <ErrorBoundary>

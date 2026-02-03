@@ -9,6 +9,7 @@ import { searchLiveJobs } from '../services/geminiService.ts';
 import { JobSearchResult, FeatureName } from '../types.ts';
 import { useHistory } from '../hooks/useHistory.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
+import { useCredits } from '../hooks/useCredits.ts';
 
 const JOB_ALERT_KEY = 'proboost-job-alerts-active';
 
@@ -62,6 +63,7 @@ export const JobSearchTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
 
   const { addHistoryItem, history } = useHistory();
+  const { checkCredits, deductCredits } = useCredits();
 
   // Initialize saved job IDs from history
   useEffect(() => {
@@ -78,8 +80,21 @@ export const JobSearchTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     e.preventDefault();
     if (!profileSummary.trim()) return;
 
+    if (!checkCredits(2)) {
+      alert("Not enough credits! Please upgrade your plan.");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
+
+    const success = await deductCredits(2);
+    if (!success) {
+      setIsLoading(false);
+      alert("Failed to process credits. Please try again.");
+      return;
+    }
+
     try {
       const data = await searchLiveJobs(profileSummary, location);
       setResult(data);

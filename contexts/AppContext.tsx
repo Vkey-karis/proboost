@@ -12,6 +12,8 @@ interface AppContextType {
   toggleTheme: () => void;
   t: (key: string) => string;
   user: User | null;
+  credits: number | null;
+  setCredits: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -62,8 +64,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, []);
 
+  const [credits, setCredits] = useState<number | null>(null);
+
   return (
-    <AppContext.Provider value={{ language, setLanguage, theme, toggleTheme, t, user }}>
+    <AppContext.Provider value={{ language, setLanguage, theme, toggleTheme, t, user, credits, setCredits }}>
       {children}
     </AppContext.Provider>
   );

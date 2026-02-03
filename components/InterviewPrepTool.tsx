@@ -5,6 +5,7 @@ import { BackButton } from './common/BackButton.tsx';
 import { Input } from './common/Input.tsx';
 import { Textarea } from './common/Textarea.tsx';
 import { Spinner } from './common/Spinner.tsx';
+import { useCredits } from '../hooks/useCredits.ts';
 import { generateInterviewGuide } from '../services/geminiService.ts';
 import { InterviewPrepAssets, FeatureName } from '../types.ts';
 import { useHistory } from '../hooks/useHistory.ts';
@@ -52,6 +53,7 @@ export const InterviewPrepTool: React.FC<{ onBack: () => void }> = ({ onBack }) 
     const [result, setResult] = useState<InterviewPrepAssets | null>(null);
     const [error, setError] = useState<string | null>(null);
     const { addHistoryItem } = useHistory();
+    const { checkCredits, deductCredits } = useCredits();
 
     useEffect(() => {
         let interval: any;
@@ -67,8 +69,21 @@ export const InterviewPrepTool: React.FC<{ onBack: () => void }> = ({ onBack }) 
         e.preventDefault();
         if (!jobDetails.trim()) return;
 
+        if (!checkCredits(5)) {
+            alert("Not enough credits! Please upgrade your plan.");
+            return;
+        }
+
         setIsLoading(true);
         setError(null);
+
+        const success = await deductCredits(5);
+        if (!success) {
+            setIsLoading(false);
+            alert("Failed to process credits. Please try again.");
+            return;
+        }
+
         try {
             const data = await generateInterviewGuide(jobDetails, companyName);
             setResult(data);

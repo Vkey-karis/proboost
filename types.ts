@@ -173,3 +173,12 @@ export interface JobPostAssets {
     jobDescription: string;
     linkedInPost: string;
 }
+
+export interface UserProfile {
+    id: string;
+    email: string;
+    full_name: string;
+    credits: number;
+    tier: 'free' | 'hunter' | 'authority' | 'agency';
+    created_at: string;
+}

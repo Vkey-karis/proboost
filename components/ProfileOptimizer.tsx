@@ -10,6 +10,7 @@ import { useHistory } from '../hooks/useHistory.ts';
 import { FeatureName, OptimizedProfile } from '../types.ts';
 import { ActionButtons } from './common/ActionButtons.tsx';
 import { downloadImage, downloadAsDocx } from '../utils/export.ts';
+import { useCredits } from '../hooks/useCredits.ts';
 
 const fileToBase64 = (file: File): Promise<{ mimeType: string, data: string }> => {
     return new Promise((resolve, reject) => {
@@ -96,6 +97,7 @@ export const ProfileOptimizer: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const [editedPhoto, setEditedPhoto] = useState<string | null>(null);
 
     const { addHistoryItem } = useHistory();
+    const { checkCredits, deductCredits } = useCredits();
 
     const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -133,10 +135,22 @@ export const ProfileOptimizer: React.FC<{ onBack: () => void }> = ({ onBack }) =
             return;
         }
 
+        if (!checkCredits(10)) {
+            alert("Not enough credits! Please upgrade your plan.");
+            return;
+        }
+
         setIsLoading(true);
         setError(null);
         setOptimizedContent(null);
         setEditedPhoto(null);
+
+        const success = await deductCredits(10);
+        if (!success) {
+            setIsLoading(false);
+            alert("Failed to process credits. Please try again.");
+            return;
+        }
 
         try {
             const promises = [];

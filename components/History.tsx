@@ -102,7 +102,11 @@ const ProjectCard: React.FC<{ item: HistoryItem; onRename: (name: string) => voi
 };
 
 
-export const History: React.FC = () => {
+import { BackButton } from './common/BackButton.tsx';
+
+// ... (imports remain)
+
+export const History: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const { history, isLoaded, deleteHistoryItem, updateHistoryItem, clearHistory } = useHistory();
     const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
     const [filter, setFilter] = useState<'all' | 'Content' | 'Career' | 'Branding' | 'Saved'>('all');
@@ -121,11 +125,14 @@ export const History: React.FC = () => {
     }
 
     if (selectedItem) {
+        // When viewing a detail, the internal "Back" button just closes the detail view.
+        // We could also allow text editing state to persist if we wanted.
         return <HistoryResultDetail item={selectedItem} onBack={() => setSelectedItem(null)} />;
     }
 
     return (
         <div className="max-w-7xl mx-auto py-8">
+            <BackButton onClick={onBack} />
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
                 <div>
                     <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white mb-2">

@@ -60,15 +60,20 @@ const PricingTier: React.FC<{
     </div>
 );
 
+import { BackButton } from './common/BackButton.tsx';
+
+// ... (imports remain)
+
 interface ResourcesProps {
     onSelectFeature: (feature: FeatureName) => void;
+    onBack: () => void;
 }
 
 import { PaymentModal } from './PaymentModal.tsx';
 
 // ... (imports remain)
 
-export const Resources: React.FC<ResourcesProps> = ({ onSelectFeature }) => {
+export const Resources: React.FC<ResourcesProps> = ({ onSelectFeature, onBack }) => {
     const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
     const [planPrice, setPlanPrice] = useState<string>('');
 
@@ -79,6 +84,7 @@ export const Resources: React.FC<ResourcesProps> = ({ onSelectFeature }) => {
 
     return (
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6">
+            <BackButton onClick={onBack} />
             <header className="text-center mb-24 animate-fade-in">
                 <div className="inline-block px-6 py-2 mb-8 text-[10px] font-black uppercase tracking-[0.4em] bg-primary-600 text-white rounded-full shadow-2xl">
                     Pick a Plan

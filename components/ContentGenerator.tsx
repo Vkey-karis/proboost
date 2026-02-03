@@ -11,6 +11,7 @@ import { PERSONAS } from '../constants.tsx';
 import { Persona, InputType, GeneratedContent, FeatureName, PostDraft } from '../types.ts';
 import { useHistory } from '../hooks/useHistory.ts';
 import { downloadPostsAsZip } from '../utils/export.ts';
+import { useCredits } from '../hooks/useCredits.ts';
 
 const InputTypeTab: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode; }> = ({ active, onClick, children }) => {
   const baseClasses = "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors";
@@ -57,6 +58,7 @@ export const ContentGenerator: React.FC<{ onBack: () => void }> = ({ onBack }) =
   const [lastState, setLastState] = useState<ContentGenState | null>(null);
 
   const { addHistoryItem } = useHistory();
+  const { checkCredits, deductCredits } = useCredits();
 
   const handleUndo = useCallback(() => {
     if (!lastState) return;
@@ -89,6 +91,20 @@ export const ContentGenerator: React.FC<{ onBack: () => void }> = ({ onBack }) =
     setIsLoading(true);
     setError(null);
     setGeneratedContent(null);
+
+    if (!checkCredits(3)) { // Check before doing anything, although user should be prompted
+      alert("Not enough credits! Please upgrade your plan.");
+      setIsLoading(false);
+      return;
+    }
+
+    const success = await deductCredits(3);
+    if (!success) {
+      setIsLoading(false);
+      alert("Failed to process credits. Please try again.");
+      return;
+    }
+
     try {
       const results = await generateLinkedInPosts(inputType, inputText, persona, wordCount, tone);
       setGeneratedContent(results);
@@ -102,7 +118,7 @@ export const ContentGenerator: React.FC<{ onBack: () => void }> = ({ onBack }) =
     } finally {
       setIsLoading(false);
     }
-  }, [inputType, inputText, persona, wordCount, tone, generatedContent, addHistoryItem]);
+  }, [inputType, inputText, persona, wordCount, tone, generatedContent, addHistoryItem, checkCredits, deductCredits]);
 
   const handleExportAll = async () => {
     if (!generatedContent) return;
