@@ -122,13 +122,13 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
                         {/* Header */}
                         <div className={`text-center mb-8 transition-all duration-300 ${isTransitioning ? 'opacity-0 transform -translate-y-2' : 'opacity-100 transform translate-y-0'}`}>
                             <div className="mb-4 flex justify-center">
-                                <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-500/30 animate-float">
-                                    <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <div className="w-20 h-20 bg-slate-900 dark:bg-white rounded-2xl flex items-center justify-center shadow-xl animate-float">
+                                    <svg className="w-10 h-10 text-white dark:text-slate-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
                                 </div>
                             </div>
-                            <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2 bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+                            <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
                                 {mode === 'login' ? 'Welcome Back' : 'Join ProBoost'}
                             </h1>
                             <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
@@ -184,7 +184,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
                                         onChange={(e) => setFullName(e.target.value)}
                                         placeholder="John Doe"
                                         required
-                                        className="dark:bg-slate-900 dark:border-slate-700 transition-all duration-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+                                        className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-slate-900 dark:focus:ring-white"
                                     />
                                 </div>
                             )}
@@ -197,7 +197,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="name@example.com"
                                     required
-                                    className="dark:bg-slate-900 dark:border-slate-700 transition-all duration-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+                                    className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-slate-900 dark:focus:ring-white"
                                 />
                             </div>
 
@@ -210,7 +210,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
                                     placeholder="••••••••"
                                     required
                                     minLength={6}
-                                    className="dark:bg-slate-900 dark:border-slate-700 transition-all duration-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+                                    className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-slate-900 dark:focus:ring-white"
                                 />
                                 {mode === 'register' && (
                                     <p className="text-xs text-slate-400 ml-1 mt-1">At least 6 characters</p>
@@ -220,7 +220,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
                             <Button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full h-12 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-bold rounded-xl shadow-lg shadow-primary-600/30 hover:shadow-xl hover:shadow-primary-600/40 transition-all duration-200 active:scale-[0.98] mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full h-12 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.98] mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {loading ? (
                                     <span className="flex items-center justify-center gap-2">
