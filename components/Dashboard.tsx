@@ -115,18 +115,28 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectFeature }) => {
               <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" /></svg>
             </div>
             <div className="relative z-10">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Welcome back</p>
-              <h2 className="text-3xl font-black text-slate-800 dark:text-white mb-6">Hi, {firstName}!</h2>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                {user ? 'Welcome back' : 'Career Booster'}
+              </p>
+              <h2 className="text-3xl font-black text-slate-800 dark:text-white mb-6">
+                {user ? `Hi, ${firstName}!` : 'Ready to Win?'}
+              </h2>
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl">
-                  <span className="text-xs font-bold text-slate-500">Current Plan</span>
-                  <span className="px-2 py-1 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400 text-[10px] font-black uppercase rounded">Free Tier</span>
+                  <span className="text-xs font-bold text-slate-500">{user ? 'Current Plan' : 'Status'}</span>
+                  <span className={`px-2 py-1 text-[10px] font-black uppercase rounded ${user ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400' : 'bg-green-100 text-green-700'
+                    }`}>
+                    {user ? 'Free Tier' : 'Guest Access'}
+                  </span>
                 </div>
                 <button
-                  onClick={() => onSelectFeature(FeatureName.Resources)}
-                  className="w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary-600 dark:hover:bg-primary-400 transition-colors shadow-lg"
+                  onClick={() => onSelectFeature(user ? FeatureName.Resources : FeatureName.Auth)}
+                  className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-colors shadow-lg ${user
+                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary-600 dark:hover:bg-primary-400'
+                      : 'bg-primary-600 hover:bg-primary-700 text-white animate-pulse'
+                    }`}
                 >
-                  Upgrade
+                  {user ? 'Upgrade' : 'Start for Free'}
                 </button>
               </div>
             </div>
