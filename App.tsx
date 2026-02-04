@@ -8,6 +8,7 @@ import { SkeletonDashboard } from './components/common/SkeletonLoader.tsx';
 import { useAppContext } from './contexts/AppContext.tsx';
 import { useCredits } from './hooks/useCredits.ts';
 import { checkFeatureAccess } from './utils/subscription.ts';
+import { BackgroundParticles } from './components/common/BackgroundParticles.tsx';
 
 // Lazy Load Components
 const Dashboard = React.lazy(() => import('./components/Dashboard.tsx').then(module => ({ default: module.Dashboard })));
@@ -206,7 +207,8 @@ const App: React.FC = () => {
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
       <Header onBackToDashboard={handleBackToDashboard} onSelectFeature={setActiveFeature} />
-      <main className="flex-grow p-4 sm:p-6 lg:p-8">
+      <BackgroundParticles />
+      <main className="flex-grow p-4 sm:p-6 lg:p-8 relative z-10">
         <ErrorBoundary>
           <Suspense fallback={<LoadingFallback />}>
             {renderActiveFeature()}

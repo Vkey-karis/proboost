@@ -12,6 +12,8 @@
     "@google/genai": "^1.20.0",
     "@paypal/react-paypal-js": "^8.9.2",
     "@supabase/supabase-js": "^2.93.3",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.9.1",
     "docx": "^8.5.0",
     "jspdf": "^4.0.0",
     "jszip": "^3.10.1",
