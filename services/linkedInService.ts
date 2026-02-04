@@ -49,7 +49,7 @@ Important:
 
         console.log('Sending request to Gemini...');
         const response = await genAI.models.generateContent({
-            model: 'gemini-2.0-flash-exp',
+            model: 'gemini-3-flash-preview',
             contents: prompt,
             config: {
                 tools: [{ googleSearch: {} }],

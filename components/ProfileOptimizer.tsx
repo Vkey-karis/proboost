@@ -131,15 +131,18 @@ export const ProfileOptimizer: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 // Switch to manual mode to show the populated form
                 setInputMode('manual');
 
-                // Show success message
+                // Clear any errors and show success
                 setError(null);
+
+                // Optional: You could add a success toast/notification here
+                console.log('✓ Profile imported successfully!');
             } else {
                 console.error('Extraction failed:', result.error);
-                setError(result.error || 'Failed to import LinkedIn profile.');
+                setError(result.error || 'Failed to import LinkedIn profile. Please ensure the profile is public and try again.');
             }
         } catch (err) {
             console.error('Import error catch:', err);
-            setError('An unexpected error occurred while importing the profile.');
+            setError('An unexpected error occurred while importing the profile. Please check your internet connection and try again.');
         } finally {
             setIsImporting(false);
         }
@@ -342,10 +345,21 @@ ${optimizedContent.keywords.join(', ')}
                                 handleLinkedInImport();
                             }}
                             disabled={isImporting || !linkedInUrl.trim()}
-                            className="w-full h-14 text-base font-bold bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full h-14 text-base font-bold bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >
-                            {isImporting ? 'Importing...' : 'Import Profile Data'}
+                            {isImporting ? (
+                                <div className="flex items-center justify-center gap-2">
+                                    <Spinner size="sm" className="text-white" />
+                                    <span>Importing...</span>
+                                </div>
+                            ) : 'Import Profile Data'}
                         </button>
+
+                        {error && inputMode === 'linkedin-url' && (
+                            <div className="p-4 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-xl">
+                                <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
