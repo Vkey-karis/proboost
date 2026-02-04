@@ -90,12 +90,24 @@ Important:
 
         // Parse the JSON response
         const data = JSON.parse(text) as LinkedInProfileData;
+        console.log('Extracted data:', data);
 
         // Validate that we got meaningful data
         if (!data.headline && !data.about) {
+            console.warn('No meaningful data extracted. LinkedIn may be blocking automated access.');
             return {
                 success: false,
-                error: 'Could not extract profile information. The profile might be private or the URL is incorrect.',
+                error: 'Unable to automatically extract LinkedIn profile data. LinkedIn restricts automated access to profiles. Please use the Manual Input option and copy-paste your profile information directly from LinkedIn.',
+            };
+        }
+
+        // Check if we got mostly empty data
+        const hasMinimalData = (data.headline?.length || 0) < 10 && (data.about?.length || 0) < 20;
+        if (hasMinimalData) {
+            console.warn('Extracted data appears incomplete:', data);
+            return {
+                success: false,
+                error: 'Could not extract complete profile information. LinkedIn restricts automated access. Please switch to Manual Input and copy your profile details directly from LinkedIn.',
             };
         }
 
@@ -107,7 +119,7 @@ Important:
         console.error('LinkedIn extraction error:', error);
         return {
             success: false,
-            error: 'Failed to extract profile data. Please ensure the profile is public and try again.',
+            error: 'Failed to extract profile data. LinkedIn restricts automated profile access. Please use the Manual Input option to copy-paste your profile information.',
         };
     }
 };
