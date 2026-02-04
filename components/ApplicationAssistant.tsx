@@ -14,7 +14,7 @@ import { ActionButtons } from './common/ActionButtons.tsx';
 import { TemplateSelector } from './common/TemplateSelector.tsx';
 
 // Set up pdf.js worker to enable PDF parsing
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@4.5.136/build/pdf.worker.min.mjs`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs`;
 
 interface AssetDisplayCardProps {
     title: string;
@@ -49,8 +49,8 @@ const AssetDisplayCard: React.FC<AssetDisplayCardProps> = ({ title, content, tem
 
     const getTemplateClasses = () => {
         if (viewMode === 'raw' && !isEditing) return 'font-mono bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400';
-        
-        switch(template) {
+
+        switch (template) {
             case 'modern': return 'font-sans border-t-8 border-primary-600 bg-white';
             case 'classic': return 'font-serif border-t-2 border-slate-900 bg-white';
             case 'minimalist': return 'font-sans text-slate-900 bg-white border-slate-100';
@@ -101,19 +101,19 @@ const AssetDisplayCard: React.FC<AssetDisplayCardProps> = ({ title, content, tem
             <div className="bg-slate-50 dark:bg-slate-900/80 px-8 py-5 border-b border-slate-200 dark:border-slate-800 flex flex-wrap justify-between items-center gap-4 rounded-t-[2rem] overflow-visible relative z-10">
                 <div className="flex items-center gap-6">
                     <div className="flex flex-col">
-                      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-0.5">{title}</h3>
-                      {atsCompliant && <span className="text-[9px] font-bold text-green-600 tracking-tighter uppercase">ATS Strategy Applied</span>}
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-0.5">{title}</h3>
+                        {atsCompliant && <span className="text-[9px] font-bold text-green-600 tracking-tighter uppercase">ATS Strategy Applied</span>}
                     </div>
-                    
+
                     {!isEditing && (
                         <div className="flex bg-slate-200 dark:bg-slate-800 p-1 rounded-xl">
-                            <button 
+                            <button
                                 onClick={() => setViewMode('preview')}
                                 className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'preview' ? 'bg-white dark:bg-slate-700 text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                             >
                                 Reading View
                             </button>
-                            <button 
+                            <button
                                 onClick={() => setViewMode('raw')}
                                 className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'raw' ? 'bg-white dark:bg-slate-700 text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                             >
@@ -130,14 +130,13 @@ const AssetDisplayCard: React.FC<AssetDisplayCardProps> = ({ title, content, tem
                             Perfected!
                         </span>
                     )}
-                    <button 
+                    <button
                         onClick={() => isEditing ? handleSave() : setIsEditing(true)}
                         disabled={isSaving}
-                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md ${
-                            isEditing 
-                            ? 'bg-green-600 text-white hover:bg-green-700 active:scale-95' 
-                            : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-primary-400'
-                        }`}
+                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md ${isEditing
+                                ? 'bg-green-600 text-white hover:bg-green-700 active:scale-95'
+                                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-primary-400'
+                            }`}
                     >
                         {isSaving ? (
                             <Spinner size="sm" className="text-white" />
@@ -151,7 +150,7 @@ const AssetDisplayCard: React.FC<AssetDisplayCardProps> = ({ title, content, tem
                         )}
                     </button>
                     {!isEditing && (
-                        <ActionButtons 
+                        <ActionButtons
                             textToCopy={content}
                             downloadFilename={title.toLowerCase().replace(/\s+/g, '-')}
                             downloadableText={content}
@@ -167,8 +166,8 @@ const AssetDisplayCard: React.FC<AssetDisplayCardProps> = ({ title, content, tem
                 <div className="bg-primary-50 dark:bg-primary-900/30 px-8 py-3 border-b border-primary-100 dark:border-primary-800 flex items-center gap-3 animate-slide-in-top">
                     <div className="w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center text-white text-[10px] font-black">!</div>
                     <p className="text-[10px] font-bold text-primary-700 dark:text-primary-300 uppercase tracking-widest">
-                        {title.includes('Resume') 
-                            ? "Coach Tip: Make sure your metric-heavy wins (like '% increase' or '$ saved') stay in bold!" 
+                        {title.includes('Resume')
+                            ? "Coach Tip: Make sure your metric-heavy wins (like '% increase' or '$ saved') stay in bold!"
                             : "Coach Tip: Mentioning a specific company goal here makes your application 3x more memorable."}
                     </p>
                 </div>
@@ -178,9 +177,9 @@ const AssetDisplayCard: React.FC<AssetDisplayCardProps> = ({ title, content, tem
             <div className={`p-12 sm:p-20 min-h-[900px] shadow-inner transition-all duration-500 overflow-hidden relative ${getTemplateClasses()}`}>
                 {isEditing ? (
                     <div className="animate-fade-in h-full flex flex-col">
-                        <textarea 
-                            value={editBuffer} 
-                            onChange={(e) => setEditBuffer(e.target.value)} 
+                        <textarea
+                            value={editBuffer}
+                            onChange={(e) => setEditBuffer(e.target.value)}
                             className="w-full flex-grow min-h-[800px] font-mono text-[14px] border-none focus:ring-0 p-0 bg-transparent resize-none leading-relaxed text-slate-700 dark:text-slate-300 placeholder:text-slate-300"
                             placeholder="Type your improvements here..."
                             autoFocus
@@ -198,10 +197,10 @@ const AssetDisplayCard: React.FC<AssetDisplayCardProps> = ({ title, content, tem
                     </div>
                 )}
             </div>
-            
+
             {/* Bottom Indicator */}
             <div className="bg-slate-50 dark:bg-slate-900 px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-center rounded-b-[2rem]">
-                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-50">Document Ends Here</span>
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-50">Document Ends Here</span>
             </div>
         </div>
     );
@@ -241,15 +240,15 @@ const ValueQuantifierCard: React.FC<{ roi: ApplicationAssets['roiAnalysis'] }> =
 );
 
 const InputTypeTab: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode; }> = ({ active, onClick, children }) => {
-  const baseClasses = "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors";
-  const activeClasses = "border-primary-500 text-primary-600 dark:text-primary-400";
-  const inactiveClasses = "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300";
-  
-  return (
-    <button type="button" onClick={onClick} className={`${baseClasses} ${active ? activeClasses : inactiveClasses}`}>
-      {children}
-    </button>
-  );
+    const baseClasses = "px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition-colors";
+    const activeClasses = "border-primary-500 text-primary-600 dark:text-primary-400";
+    const inactiveClasses = "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300";
+
+    return (
+        <button type="button" onClick={onClick} className={`${baseClasses} ${active ? activeClasses : inactiveClasses}`}>
+            {children}
+        </button>
+    );
 };
 
 interface AppAssistantState {
@@ -270,16 +269,16 @@ export const ApplicationAssistant: React.FC = () => {
     const [userEmail, setUserEmail] = useState('');
     const [template, setTemplate] = useState<ProfileTemplate>('modern');
     const [atsCompliance, setAtsCompliance] = useState(true);
-    
+
     const [isLoading, setIsLoading] = useState(false);
     const [isReadingResumeFile, setIsReadingResumeFile] = useState(false);
     const [isReadingJdFile, setIsReadingJdFile] = useState(false);
     const [isScrapingUrl, setIsScrapingUrl] = useState(false);
-    
+
     const [error, setError] = useState<string | null>(null);
     const [generatedAssets, setGeneratedAssets] = useState<ApplicationAssets | null>(null);
     const [lastState, setLastState] = useState<AppAssistantState | null>(null);
-    
+
     const { addHistoryItem } = useHistory();
 
     const parseFileToText = async (file: File): Promise<string> => {
@@ -298,7 +297,7 @@ export const ApplicationAssistant: React.FC = () => {
             const result = await mammoth.extractRawText({ arrayBuffer });
             text = result.value;
         } else if (file.type === 'text/plain') {
-             text = await file.text();
+            text = await file.text();
         } else {
             throw new Error('Unsupported file. Please upload .txt, .pdf, or .docx');
         }
@@ -348,7 +347,7 @@ export const ApplicationAssistant: React.FC = () => {
             event.target.value = '';
         }
     };
-    
+
     const handleUrlFetch = async () => {
         if (!jobDescriptionUrl.trim()) { setError('Please enter a URL.'); return; }
         setIsScrapingUrl(true);
@@ -357,7 +356,7 @@ export const ApplicationAssistant: React.FC = () => {
             await new Promise(resolve => setTimeout(resolve, 1500));
             setJobDescription(`Position: Senior AI Engineer\nCompany: FutureScale\nLocation: San Francisco (Hybrid)\n\nResponsibilities:\n- Develop and deploy large-scale generative AI models.\n- Optimize inference pipelines for low latency.\n- Lead cross-functional teams in technical product development.`);
         } catch (e) {
-             setError('Failed to fetch JD from URL. Please paste it instead.');
+            setError('Failed to fetch JD from URL. Please paste it instead.');
         } finally {
             setIsScrapingUrl(false);
         }
@@ -409,24 +408,24 @@ export const ApplicationAssistant: React.FC = () => {
                     <div className="flex justify-between items-center mb-8">
                         <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Application Lab</h2>
                         {lastState && (
-                            <button 
-                              onClick={handleUndo} 
-                              className="text-xs flex items-center gap-1 text-slate-500 hover:text-primary-600 transition-colors"
-                              title="Undo last generation"
+                            <button
+                                onClick={handleUndo}
+                                className="text-xs flex items-center gap-1 text-slate-500 hover:text-primary-600 transition-colors"
+                                title="Undo last generation"
                             >
-                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l5 5m-5-5l5-5" />
-                              </svg>
-                              Undo
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l5 5m-5-5l5-5" />
+                                </svg>
+                                Undo
                             </button>
                         )}
                     </div>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 mb-6">
-                            <TemplateSelector 
-                              label="Visual Style" 
-                              selected={template} 
-                              onSelect={setTemplate}
+                            <TemplateSelector
+                                label="Visual Style"
+                                selected={template}
+                                onSelect={setTemplate}
                             />
                         </div>
 
@@ -486,16 +485,16 @@ export const ApplicationAssistant: React.FC = () => {
                                 </div>
                             </div>
                             <Button type="button" variant="secondary" onClick={() => document.getElementById('resume-upload')?.click()} disabled={isReadingResumeFile} className="w-full h-14 rounded-2xl border-dashed border-2 flex items-center justify-center gap-2">
-                                {isReadingResumeFile ? <Spinner size="sm" /> : <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" strokeWidth={2.5}/></svg>}
+                                {isReadingResumeFile ? <Spinner size="sm" /> : <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" strokeWidth={2.5} /></svg>}
                                 Import Your Current CV
                                 <input type="file" id="resume-upload" accept=".txt,.pdf,.docx" onChange={handleResumeFileChange} className="hidden" />
                             </Button>
-                            <Textarea 
-                                rows={6} 
-                                value={resumeInfo} 
-                                onChange={(e) => setResumeInfo(e.target.value)} 
-                                placeholder={historyInputType === 'bullets' ? "List your biggest wins:\n- Managed $2M budget\n- Hired 10 engineers\n- 15% revenue lift" : "Paste your experience highlights or existing CV text here..."} 
-                                className="rounded-3xl p-6" 
+                            <Textarea
+                                rows={6}
+                                value={resumeInfo}
+                                onChange={(e) => setResumeInfo(e.target.value)}
+                                placeholder={historyInputType === 'bullets' ? "List your biggest wins:\n- Managed $2M budget\n- Hired 10 engineers\n- 15% revenue lift" : "Paste your experience highlights or existing CV text here..."}
+                                className="rounded-3xl p-6"
                             />
                         </div>
 
@@ -520,7 +519,7 @@ export const ApplicationAssistant: React.FC = () => {
                 {generatedAssets && (
                     <div className="space-y-16 animate-fade-in overflow-visible relative">
                         <div className="flex flex-col sm:flex-row justify-between items-center bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-xl sticky top-[72px] z-[40] border border-slate-200 dark:border-slate-700 gap-6">
-                             <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4">
                                 <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-2xl">
                                     <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -530,12 +529,12 @@ export const ApplicationAssistant: React.FC = () => {
                                     <h2 className="text-xl font-black uppercase tracking-tight">Your Assets Are Ready</h2>
                                     <p className="text-xs text-slate-500 font-medium">Ready for review and export</p>
                                 </div>
-                             </div>
-                             <div className="flex gap-3">
+                            </div>
+                            <div className="flex gap-3">
                                 <Button variant="secondary" onClick={() => downloadAsDocx('Full-Application', `RESUME\n\n${generatedAssets.resume}\n\nCOVER LETTER\n\n${generatedAssets.coverLetter}`)} className="h-12 px-6 rounded-xl font-black uppercase text-[10px] tracking-widest border-slate-300 dark:border-slate-600">
                                     Download Bundle (.docx)
                                 </Button>
-                             </div>
+                            </div>
                         </div>
 
                         <ValueQuantifierCard roi={generatedAssets.roiAnalysis} />
@@ -545,10 +544,10 @@ export const ApplicationAssistant: React.FC = () => {
                                 <div className="w-3 h-10 bg-primary-500 rounded-full" />
                                 <h3 className="text-3xl font-black uppercase tracking-tight">The Cover Letter</h3>
                             </div>
-                            <AssetDisplayCard 
-                                title="Tailored Cover Letter" 
-                                content={generatedAssets.coverLetter} 
-                                template={template} 
+                            <AssetDisplayCard
+                                title="Tailored Cover Letter"
+                                content={generatedAssets.coverLetter}
+                                template={template}
                                 onUpdate={(c) => updateAssetContent('coverLetter', c)}
                                 atsCompliant={lastState?.atsCompliance}
                             />
@@ -559,17 +558,17 @@ export const ApplicationAssistant: React.FC = () => {
                                 <div className="w-3 h-10 bg-primary-500 rounded-full" />
                                 <h3 className="text-3xl font-black uppercase tracking-tight">The ATS Resume</h3>
                             </div>
-                            <AssetDisplayCard 
-                                title="Optimized Resume" 
-                                content={generatedAssets.resume} 
-                                template={template} 
+                            <AssetDisplayCard
+                                title="Optimized Resume"
+                                content={generatedAssets.resume}
+                                template={template}
                                 onUpdate={(c) => updateAssetContent('resume', c)}
                                 atsCompliant={lastState?.atsCompliance}
                             />
                         </section>
                     </div>
                 )}
-                
+
                 {!isLoading && !generatedAssets && (
                     <div className="flex flex-col items-center justify-center min-h-[600px] text-center p-20 bg-white dark:bg-slate-800 rounded-[4rem] shadow-xl border-2 border-dashed border-slate-200 dark:border-slate-800">
                         <div className="p-10 bg-slate-50 dark:bg-slate-900 rounded-full mb-10 shadow-inner ring-8 ring-primary-50 dark:ring-primary-900/10">
