@@ -83,17 +83,17 @@ const App: React.FC = () => {
   const { user } = useAppContext();
 
   // Handle OAuth callback redirect
+  // Handle OAuth callback redirect cleaning
   useEffect(() => {
-    // Check if we have OAuth tokens in the URL hash (from Supabase OAuth redirect)
-    const hash = window.location.hash;
-    if (hash && hash.includes('access_token')) {
-      // Clear the hash from URL immediately
+    // Only clear hash AFTER we have a user (meaning Supabase processed it)
+    if (user && window.location.hash && window.location.hash.includes('access_token')) {
+      // Clear the hash from URL cleanly
       window.history.replaceState(null, '', window.location.pathname);
 
-      // Ensure we're on the dashboard (not Auth page)
+      // Ensure we're on the dashboard
       setActiveFeature(null);
     }
-  }, []);
+  }, [user]);
 
   // Auto-redirect logged-in users away from Auth page to dashboard
   useEffect(() => {
