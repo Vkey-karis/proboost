@@ -14,6 +14,8 @@ interface AppContextType {
   user: User | null;
   credits: number | null;
   setCredits: React.Dispatch<React.SetStateAction<number | null>>;
+  tier: string;
+  setTier: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -65,9 +67,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const [credits, setCredits] = useState<number | null>(null);
+  const [tier, setTier] = useState<string>('free');
 
   return (
-    <AppContext.Provider value={{ language, setLanguage, theme, toggleTheme, t, user, credits, setCredits }}>
+    <AppContext.Provider value={{ language, setLanguage, theme, toggleTheme, t, user, credits, setCredits, tier, setTier }}>
       {children}
     </AppContext.Provider>
   );

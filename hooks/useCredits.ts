@@ -3,7 +3,7 @@ import { supabase } from '../services/supabaseClient.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 
 export const useCredits = () => {
-    const { user, credits, setCredits } = useAppContext();
+    const { user, credits, setCredits, tier, setTier } = useAppContext();
     const [loading, setLoading] = useState(false);
 
     const fetchCredits = useCallback(async () => {
@@ -12,17 +12,18 @@ export const useCredits = () => {
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('credits')
+                .select('credits, tier')
                 .eq('id', user.id)
                 .single();
 
             if (data && !error) {
                 setCredits(data.credits);
+                setTier(data.tier || 'free');
             }
         } catch (err) {
             console.error('Error fetching credits:', err);
         }
-    }, [user, setCredits]);
+    }, [user, setCredits, setTier]);
 
     // Initial fetch
     useEffect(() => {
@@ -78,6 +79,7 @@ export const useCredits = () => {
 
     return {
         credits,
+        tier,
         loading,
         fetchCredits,
         checkCredits,

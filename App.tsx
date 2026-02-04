@@ -6,6 +6,8 @@ import { Footer } from './components/Footer.tsx';
 import { FeatureName } from './types.ts';
 import { SkeletonDashboard } from './components/common/SkeletonLoader.tsx';
 import { useAppContext } from './contexts/AppContext.tsx';
+import { useCredits } from './hooks/useCredits.ts';
+import { checkFeatureAccess } from './utils/subscription.ts';
 
 // Lazy Load Components
 const Dashboard = React.lazy(() => import('./components/Dashboard.tsx').then(module => ({ default: module.Dashboard })));
@@ -138,11 +140,20 @@ const App: React.FC = () => {
     "description": "AI-powered career toolkit for job seekers."
   };
 
+  const { credits, tier, isTrialActive } = useCredits();
+
   const handleBackToDashboard = useCallback(() => {
     setActiveFeature(null);
   }, []);
 
   const renderActiveFeature = () => {
+    // Access Control Check
+    if (activeFeature && !checkFeatureAccess(tier, activeFeature, isTrialActive)) {
+      // If not allowed, show Pricing page with a message (passed via props if Resources supported it, or just show it)
+      // Ideally we'd show a toast or alert, but redirecting to Resources is a good flow.
+      return <Resources onSelectFeature={setActiveFeature} onBack={handleBackToDashboard} />;
+    }
+
     switch (activeFeature) {
       case FeatureName.InterviewPrep:
         return <InterviewPrepTool onBack={handleBackToDashboard} />;
