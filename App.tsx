@@ -9,6 +9,7 @@ import { useAppContext } from './contexts/AppContext.tsx';
 import { useCredits } from './hooks/useCredits.ts';
 import { checkFeatureAccess } from './utils/subscription.ts';
 import { BackgroundParticles } from './components/common/BackgroundParticles.tsx';
+import { ScrollToTop } from './components/common/ScrollToTop.tsx';
 
 // Lazy Load Components
 const Dashboard = React.lazy(() => import('./components/Dashboard.tsx').then(module => ({ default: module.Dashboard })));
@@ -216,6 +217,7 @@ const App: React.FC = () => {
         </ErrorBoundary>
       </main>
       <Footer onSelectFeature={setActiveFeature} />
+      <ScrollToTop />
     </div>
   );
 };
