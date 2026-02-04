@@ -1,4 +1,4 @@
-import { genAI } from './geminiService';
+import { GoogleGenAI, Type } from '@google/genai';
 import { LinkedInImportResult, LinkedInProfileData } from '../types';
 
 /**
@@ -27,37 +27,42 @@ export const extractLinkedInProfile = async (url: string): Promise<LinkedInImpor
     }
 
     try {
-        const model = genAI.getGenerativeModel({
-            model: 'gemini-2.0-flash-exp',
-        });
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+        if (!apiKey) {
+            throw new Error('Gemini API key not configured');
+        }
+
+        const genAI = new GoogleGenAI({ apiKey });
 
         const prompt = `You are analyzing a LinkedIn profile URL: ${url}
 
-Please extract the following information from this public LinkedIn profile and return it as valid JSON:
-
-{
-  "headline": "The person's current professional headline/title",
-  "about": "Their about/summary section (full text)",
-  "education": "Education history with schools and degrees",
-  "skills": "Listed skills and endorsements"
-}
+Please extract the following information from this public LinkedIn profile and return it as valid JSON.
 
 Important:
 - Only extract information that is publicly visible
 - If a section is not available, use an empty string ""
-- Return ONLY the JSON object, no additional text
 - Be comprehensive - include all available details from each section`;
 
-        const result = await model.generateContent({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: {
-                temperature: 0.1,
+        const response = await genAI.models.generateContent({
+            model: 'gemini-2.0-flash-exp',
+            contents: prompt,
+            config: {
+                tools: [{ googleSearch: {} }],
                 responseMimeType: 'application/json',
-            },
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        headline: { type: Type.STRING },
+                        about: { type: Type.STRING },
+                        education: { type: Type.STRING },
+                        skills: { type: Type.STRING },
+                    },
+                    required: ['headline', 'about', 'education', 'skills']
+                }
+            }
         });
 
-        const response = result.response;
-        const text = response.text();
+        const text = response.text.trim();
 
         // Parse the JSON response
         const data = JSON.parse(text) as LinkedInProfileData;
