@@ -19,7 +19,9 @@ const isValidLinkedInUrl = (url: string): boolean => {
  */
 export const extractLinkedInProfile = async (url: string): Promise<LinkedInImportResult> => {
     // Validate URL
+    console.log('Validating URL:', url);
     if (!isValidLinkedInUrl(url)) {
+        console.error('Invalid URL');
         return {
             success: false,
             error: 'Invalid LinkedIn URL. Please provide a valid LinkedIn profile URL (e.g., linkedin.com/in/username)',
@@ -29,9 +31,11 @@ export const extractLinkedInProfile = async (url: string): Promise<LinkedInImpor
     try {
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
         if (!apiKey) {
+            console.error('Missing API Key');
             throw new Error('Gemini API key not configured');
         }
 
+        console.log('Initializing Gemini client...');
         const genAI = new GoogleGenAI({ apiKey });
 
         const prompt = `You are analyzing a LinkedIn profile URL: ${url}
@@ -43,6 +47,7 @@ Important:
 - If a section is not available, use an empty string ""
 - Be comprehensive - include all available details from each section`;
 
+        console.log('Sending request to Gemini...');
         const response = await genAI.models.generateContent({
             model: 'gemini-2.0-flash-exp',
             contents: prompt,
@@ -62,7 +67,9 @@ Important:
             }
         });
 
+        console.log('Received response from Gemini');
         const text = response.text.trim();
+        console.log('Parsed text:', text);
 
         // Parse the JSON response
         const data = JSON.parse(text) as LinkedInProfileData;

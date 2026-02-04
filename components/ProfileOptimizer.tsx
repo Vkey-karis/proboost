@@ -105,6 +105,9 @@ export const ProfileOptimizer: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const { checkCredits, deductCredits } = useCredits();
 
     const handleLinkedInImport = async () => {
+        console.log('Import button clicked');
+        console.log('URL:', linkedInUrl);
+
         if (!linkedInUrl.trim()) {
             setError('Please enter a LinkedIn profile URL.');
             return;
@@ -114,7 +117,9 @@ export const ProfileOptimizer: React.FC<{ onBack: () => void }> = ({ onBack }) =
         setError(null);
 
         try {
+            console.log('Calling extractLinkedInProfile...');
             const result = await extractLinkedInProfile(linkedInUrl);
+            console.log('Extraction result:', result);
 
             if (result.success && result.data) {
                 // Populate form fields with extracted data
@@ -129,10 +134,11 @@ export const ProfileOptimizer: React.FC<{ onBack: () => void }> = ({ onBack }) =
                 // Show success message
                 setError(null);
             } else {
+                console.error('Extraction failed:', result.error);
                 setError(result.error || 'Failed to import LinkedIn profile.');
             }
         } catch (err) {
-            console.error('Import error:', err);
+            console.error('Import error catch:', err);
             setError('An unexpected error occurred while importing the profile.');
         } finally {
             setIsImporting(false);
@@ -269,8 +275,8 @@ ${optimizedContent.keywords.join(', ')}
                         type="button"
                         onClick={() => setInputMode('manual')}
                         className={`px-8 py-4 rounded-2xl font-bold text-sm transition-all border-2 ${inputMode === 'manual'
-                                ? 'bg-primary-600 text-white border-primary-600 shadow-lg scale-105'
-                                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-primary-400'
+                            ? 'bg-primary-600 text-white border-primary-600 shadow-lg scale-105'
+                            : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-primary-400'
                             }`}
                     >
                         <div className="flex items-center gap-3">
@@ -285,8 +291,8 @@ ${optimizedContent.keywords.join(', ')}
                         type="button"
                         onClick={() => setInputMode('linkedin-url')}
                         className={`px-8 py-4 rounded-2xl font-bold text-sm transition-all border-2 ${inputMode === 'linkedin-url'
-                                ? 'bg-primary-600 text-white border-primary-600 shadow-lg scale-105'
-                                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-primary-400'
+                            ? 'bg-primary-600 text-white border-primary-600 shadow-lg scale-105'
+                            : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-primary-400'
                             }`}
                     >
                         <div className="flex items-center gap-3">
