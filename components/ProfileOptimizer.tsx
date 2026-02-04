@@ -333,7 +333,7 @@ ${optimizedContent.keywords.join(', ')}
                             <Input
                                 value={linkedInUrl}
                                 onChange={(e) => setLinkedInUrl(e.target.value)}
-                                placeholder="https://www.linkedin.com/in/yourname"
+                                placeholder="linkedin.com/in/yourname or https://linkedin.com/in/yourname"
                                 className="h-14 text-base"
                             />
                         </div>

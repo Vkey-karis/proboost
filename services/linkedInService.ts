@@ -2,11 +2,24 @@ import { GoogleGenAI, Type } from '@google/genai';
 import { LinkedInImportResult, LinkedInProfileData } from '../types';
 
 /**
+ * Normalizes a LinkedIn URL by adding https:// if missing
+ */
+const normalizeLinkedInUrl = (url: string): string => {
+    const trimmed = url.trim();
+    // If it doesn't start with http:// or https://, add https://
+    if (!trimmed.match(/^https?:\/\//i)) {
+        return `https://${trimmed}`;
+    }
+    return trimmed;
+};
+
+/**
  * Validates if a URL is a valid LinkedIn profile URL
  */
 const isValidLinkedInUrl = (url: string): boolean => {
     try {
-        const urlObj = new URL(url);
+        const normalizedUrl = normalizeLinkedInUrl(url);
+        const urlObj = new URL(normalizedUrl);
         return urlObj.hostname.includes('linkedin.com') &&
             (urlObj.pathname.includes('/in/') || urlObj.pathname.includes('/pub/'));
     } catch {
@@ -28,6 +41,10 @@ export const extractLinkedInProfile = async (url: string): Promise<LinkedInImpor
         };
     }
 
+    // Normalize the URL for use in the API call
+    const normalizedUrl = normalizeLinkedInUrl(url);
+    console.log('Normalized URL:', normalizedUrl);
+
     try {
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
         if (!apiKey) {
@@ -38,7 +55,7 @@ export const extractLinkedInProfile = async (url: string): Promise<LinkedInImpor
         console.log('Initializing Gemini client...');
         const genAI = new GoogleGenAI({ apiKey });
 
-        const prompt = `You are analyzing a LinkedIn profile URL: ${url}
+        const prompt = `You are analyzing a LinkedIn profile URL: ${normalizedUrl}
 
 Please extract the following information from this public LinkedIn profile and return it as valid JSON.
 
