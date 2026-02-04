@@ -174,6 +174,20 @@ export interface JobPostAssets {
     linkedInPost: string;
 }
 
+export interface LinkedInProfileData {
+    headline: string;
+    about: string;
+    education: string;
+    skills: string;
+    photoUrl?: string;
+}
+
+export interface LinkedInImportResult {
+    success: boolean;
+    data?: LinkedInProfileData;
+    error?: string;
+}
+
 export interface UserProfile {
     id: string;
     email: string;

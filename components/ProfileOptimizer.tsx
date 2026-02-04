@@ -6,6 +6,7 @@ import { Textarea } from './common/Textarea.tsx';
 import { Input } from './common/Input.tsx';
 import { Spinner } from './common/Spinner.tsx';
 import { optimizeLinkedInProfile, editProfilePhoto, generateProfilePhoto } from '../services/geminiService.ts';
+import { extractLinkedInProfile } from '../services/linkedInService.ts';
 import { useHistory } from '../hooks/useHistory.ts';
 import { FeatureName, OptimizedProfile } from '../types.ts';
 import { ActionButtons } from './common/ActionButtons.tsx';
@@ -76,6 +77,10 @@ const InputTypeTab: React.FC<{ active: boolean; onClick: () => void; children: R
 };
 
 export const ProfileOptimizer: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+    const [inputMode, setInputMode] = useState<'manual' | 'linkedin-url'>('manual');
+    const [linkedInUrl, setLinkedInUrl] = useState('');
+    const [isImporting, setIsImporting] = useState(false);
+
     const [headline, setHeadline] = useState('');
     const [about, setAbout] = useState('');
     const [aboutInputType, setAboutInputType] = useState<'text' | 'bullets'>('text');
@@ -98,6 +103,41 @@ export const ProfileOptimizer: React.FC<{ onBack: () => void }> = ({ onBack }) =
 
     const { addHistoryItem } = useHistory();
     const { checkCredits, deductCredits } = useCredits();
+
+    const handleLinkedInImport = async () => {
+        if (!linkedInUrl.trim()) {
+            setError('Please enter a LinkedIn profile URL.');
+            return;
+        }
+
+        setIsImporting(true);
+        setError(null);
+
+        try {
+            const result = await extractLinkedInProfile(linkedInUrl);
+
+            if (result.success && result.data) {
+                // Populate form fields with extracted data
+                setHeadline(result.data.headline || '');
+                setAbout(result.data.about || '');
+                setEducation(result.data.education || '');
+                setSkills(result.data.skills || '');
+
+                // Switch to manual mode to show the populated form
+                setInputMode('manual');
+
+                // Show success message
+                setError(null);
+            } else {
+                setError(result.error || 'Failed to import LinkedIn profile.');
+            }
+        } catch (err) {
+            console.error('Import error:', err);
+            setError('An unexpected error occurred while importing the profile.');
+        } finally {
+            setIsImporting(false);
+        }
+    };
 
     const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -216,115 +256,215 @@ ${optimizedContent.keywords.join(', ')}
     return (
         <div className="max-w-7xl mx-auto space-y-12 pb-20">
             <BackButton onClick={onBack} />
+
+            {/* Input Mode Selection */}
             <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700">
-                <form onSubmit={handleSubmit} className="space-y-10">
-                    {/* Visual Studio UI */}
-                    <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-inner">
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="p-3 bg-primary-100 dark:bg-primary-900/40 rounded-2xl">
-                                <svg className="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            </div>
-                            <div>
-                                <h3 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Studio AI Headshot Assistant</h3>
-                                <p className="text-slate-500 font-medium">Transform a selfie or generate a brand new professional image.</p>
+                <div className="text-center mb-8">
+                    <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2">How would you like to start?</h2>
+                    <p className="text-slate-500">Choose your preferred input method</p>
+                </div>
+
+                <div className="flex justify-center gap-4 mb-8">
+                    <button
+                        type="button"
+                        onClick={() => setInputMode('manual')}
+                        className={`px-8 py-4 rounded-2xl font-bold text-sm transition-all border-2 ${inputMode === 'manual'
+                                ? 'bg-primary-600 text-white border-primary-600 shadow-lg scale-105'
+                                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-primary-400'
+                            }`}
+                    >
+                        <div className="flex items-center gap-3">
+                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            <span>Manual Input</span>
+                        </div>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setInputMode('linkedin-url')}
+                        className={`px-8 py-4 rounded-2xl font-bold text-sm transition-all border-2 ${inputMode === 'linkedin-url'
+                                ? 'bg-primary-600 text-white border-primary-600 shadow-lg scale-105'
+                                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-primary-400'
+                            }`}
+                    >
+                        <div className="flex items-center gap-3">
+                            <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                            </svg>
+                            <span>Import from LinkedIn</span>
+                        </div>
+                    </button>
+                </div>
+
+                {/* LinkedIn URL Import Section */}
+                {inputMode === 'linkedin-url' && (
+                    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
+                        <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-2xl p-6">
+                            <div className="flex gap-3">
+                                <svg className="h-6 w-6 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div className="text-sm text-blue-900 dark:text-blue-100">
+                                    <p className="font-bold mb-1">How to get your LinkedIn URL:</p>
+                                    <ol className="list-decimal list-inside space-y-1 text-blue-800 dark:text-blue-200">
+                                        <li>Go to your LinkedIn profile</li>
+                                        <li>Click "Edit public profile & URL" on the right</li>
+                                        <li>Copy your public profile URL (e.g., linkedin.com/in/yourname)</li>
+                                    </ol>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="flex flex-col lg:flex-row gap-10 items-start">
-                            <div className="flex-shrink-0 w-full lg:w-56 space-y-4">
-                                <div className="flex bg-slate-200 dark:bg-slate-800 p-1 rounded-xl shadow-sm">
-                                    <button type="button" onClick={() => setPhotoMode('upload')} className={`flex-1 text-[11px] font-black uppercase py-3 rounded-lg transition-all ${photoMode === 'upload' ? 'bg-white text-primary-600 shadow-md' : 'text-slate-500'}`}>Upload</button>
-                                    <button type="button" onClick={() => setPhotoMode('generate')} className={`flex-1 text-[11px] font-black uppercase py-3 rounded-lg transition-all ${photoMode === 'generate' ? 'bg-white text-primary-600 shadow-md' : 'text-slate-500'}`}>Generate</button>
-                                </div>
-                                <div className="aspect-square bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border-2 border-dashed border-slate-300 dark:border-slate-700 shadow-xl group relative cursor-pointer" onClick={() => photoMode === 'upload' && document.getElementById('photo-input')?.click()}>
-                                    {photoPreview ? <img src={photoPreview} className="w-full h-full object-cover" /> : <div className="flex flex-col items-center justify-center h-full p-4"><div className="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mb-2"><svg className="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 4v16m8-8H4" strokeWidth={2.5} /></svg></div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No Image Selected</span></div>}
-                                    <input type="file" id="photo-input" className="hidden" accept="image/*" onChange={handlePhotoUpload} />
-                                </div>
-                            </div>
-
-                            <div className="flex-grow w-full space-y-8">
-                                {photoMode === 'generate' ? (
-                                    <div className="space-y-4">
-                                        <Textarea value={photoGenPrompt} onChange={e => setPhotoGenPrompt(e.target.value)} placeholder="e.g., Professional corporate portrait of a woman in a grey blazer, soft blurred background..." rows={3} className="bg-white" />
-                                        <Button type="button" onClick={handleGenerateHeadshot} disabled={isGeneratingPhoto} className="w-full h-12">
-                                            {isGeneratingPhoto ? <Spinner size="sm" className="text-white" /> : 'Generate AI Headshot'}
-                                        </Button>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-6">
-                                        <div>
-                                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">Quick Studio Enhancements</h4>
-                                            <div className="flex flex-wrap gap-3">
-                                                {PRESETS.map(p => (
-                                                    <button key={p.id} type="button" onClick={() => togglePreset(p.id)} className={`px-6 py-2.5 rounded-full text-xs font-bold transition-all border ${selectedPresets.includes(p.id) ? 'bg-primary-600 text-white border-primary-600 shadow-lg' : 'bg-white text-slate-600 border-slate-200 hover:border-primary-400'}`}>
-                                                        {p.label}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Refinement Instructions</h4>
-                                            <Input value={photoEditPrompt} onChange={e => photoEditPrompt === e.target.value ? null : setPhotoEditPrompt(e.target.value)} placeholder="e.g., Change my tie to navy blue, remove the shadows..." className="bg-white h-14" />
-                                        </div>
-                                    </div>
-                                )}
-                                <p className="text-[9px] font-bold text-slate-400 tracking-[0.1em] uppercase">Powered by Gemini Visual Intelligence</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Text Optimization Section */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Current Headline*</label>
-                            <Input value={headline} onChange={e => setHeadline(e.target.value)} placeholder="e.g., Senior Project Manager at Amazon" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Target Goal</label>
-                            <select value={goal} onChange={e => setGoal(e.target.value)} className="w-full h-[42px] px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm text-sm">
-                                <option value="job-seeking">Find a new job (Recruiter Focus)</option>
-                                <option value="personal-brand">Build personal brand (Authority Focus)</option>
-                                <option value="sales">Generate Leads (Client Focus)</option>
-                            </select>
-                        </div>
-                        <div className="md:col-span-2">
-                            <div className="flex justify-between items-center mb-2">
-                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Current About Section*</label>
-                                <div className="flex bg-slate-100 dark:bg-slate-900 rounded-lg p-0.5">
-                                    <InputTypeTab active={aboutInputType === 'text'} onClick={() => setAboutInputType('text')}>Existing Bio</InputTypeTab>
-                                    <InputTypeTab active={aboutInputType === 'bullets'} onClick={() => setAboutInputType('bullets')}>Bulleted List</InputTypeTab>
-                                </div>
-                            </div>
-                            <Textarea
-                                rows={6}
-                                value={about}
-                                onChange={e => setAbout(e.target.value)}
-                                placeholder={aboutInputType === 'bullets' ? "Enter achievements as bullet points:\n- Managed a team of 10 developers\n- Reduced infrastructure costs by 25%\n- Orchestrated the launch of 'Product X'" : "Paste your current profile intro here..."}
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+                                LinkedIn Profile URL
+                            </label>
+                            <Input
+                                value={linkedInUrl}
+                                onChange={(e) => setLinkedInUrl(e.target.value)}
+                                placeholder="https://www.linkedin.com/in/yourname"
+                                className="h-14 text-base"
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Education History</label>
-                            <Textarea rows={3} value={education} onChange={e => setEducation(e.target.value)} placeholder="List your degrees, schools, and years..." />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Core Skills</label>
-                            <Textarea rows={3} value={skills} onChange={e => setSkills(e.target.value)} placeholder="e.g., Python, React, Team Leadership..." />
-                        </div>
-                    </div>
 
-                    <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-700">
-                        <Button type="submit" disabled={isLoading || !headline || !about} className="h-16 px-12 text-lg font-black uppercase tracking-widest shadow-2xl rounded-2xl transform transition-all hover:scale-[1.02] bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 flex items-center justify-center gap-3">
-                            {isLoading ? <div className="flex items-center gap-3"><Spinner size="sm" className="text-white dark:text-slate-900" /> <span>Building Assets...</span></div> : (
-                                <>
-                                    <span>Apply Changes & Optimize</span>
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                </>
+                        <Button
+                            type="button"
+                            onClick={handleLinkedInImport}
+                            disabled={isImporting || !linkedInUrl.trim()}
+                            className="w-full h-14 text-base font-bold"
+                        >
+                            {isImporting ? (
+                                <div className="flex items-center justify-center gap-3">
+                                    <Spinner size="sm" className="text-white" />
+                                    <span>Importing Profile...</span>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center gap-2">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                    <span>Import Profile Data</span>
+                                </div>
                             )}
                         </Button>
                     </div>
-                    {error && <p className="text-center text-red-500 font-bold bg-red-50 p-4 rounded-xl border border-red-100">{error}</p>}
-                </form>
+                )}
             </div>
+
+            {/* Main Form - Only show in manual mode */}
+            {inputMode === 'manual' && (
+                <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-700">
+                    <form onSubmit={handleSubmit} className="space-y-10">
+                        {/* Visual Studio UI */}
+                        <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-inner">
+                            <div className="flex items-center gap-4 mb-8">
+                                <div className="p-3 bg-primary-100 dark:bg-primary-900/40 rounded-2xl">
+                                    <svg className="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Studio AI Headshot Assistant</h3>
+                                    <p className="text-slate-500 font-medium">Transform a selfie or generate a brand new professional image.</p>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col lg:flex-row gap-10 items-start">
+                                <div className="flex-shrink-0 w-full lg:w-56 space-y-4">
+                                    <div className="flex bg-slate-200 dark:bg-slate-800 p-1 rounded-xl shadow-sm">
+                                        <button type="button" onClick={() => setPhotoMode('upload')} className={`flex-1 text-[11px] font-black uppercase py-3 rounded-lg transition-all ${photoMode === 'upload' ? 'bg-white text-primary-600 shadow-md' : 'text-slate-500'}`}>Upload</button>
+                                        <button type="button" onClick={() => setPhotoMode('generate')} className={`flex-1 text-[11px] font-black uppercase py-3 rounded-lg transition-all ${photoMode === 'generate' ? 'bg-white text-primary-600 shadow-md' : 'text-slate-500'}`}>Generate</button>
+                                    </div>
+                                    <div className="aspect-square bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border-2 border-dashed border-slate-300 dark:border-slate-700 shadow-xl group relative cursor-pointer" onClick={() => photoMode === 'upload' && document.getElementById('photo-input')?.click()}>
+                                        {photoPreview ? <img src={photoPreview} className="w-full h-full object-cover" /> : <div className="flex flex-col items-center justify-center h-full p-4"><div className="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mb-2"><svg className="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 4v16m8-8H4" strokeWidth={2.5} /></svg></div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No Image Selected</span></div>}
+                                        <input type="file" id="photo-input" className="hidden" accept="image/*" onChange={handlePhotoUpload} />
+                                    </div>
+                                </div>
+
+                                <div className="flex-grow w-full space-y-8">
+                                    {photoMode === 'generate' ? (
+                                        <div className="space-y-4">
+                                            <Textarea value={photoGenPrompt} onChange={e => setPhotoGenPrompt(e.target.value)} placeholder="e.g., Professional corporate portrait of a woman in a grey blazer, soft blurred background..." rows={3} className="bg-white" />
+                                            <Button type="button" onClick={handleGenerateHeadshot} disabled={isGeneratingPhoto} className="w-full h-12">
+                                                {isGeneratingPhoto ? <Spinner size="sm" className="text-white" /> : 'Generate AI Headshot'}
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-6">
+                                            <div>
+                                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">Quick Studio Enhancements</h4>
+                                                <div className="flex flex-wrap gap-3">
+                                                    {PRESETS.map(p => (
+                                                        <button key={p.id} type="button" onClick={() => togglePreset(p.id)} className={`px-6 py-2.5 rounded-full text-xs font-bold transition-all border ${selectedPresets.includes(p.id) ? 'bg-primary-600 text-white border-primary-600 shadow-lg' : 'bg-white text-slate-600 border-slate-200 hover:border-primary-400'}`}>
+                                                            {p.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Refinement Instructions</h4>
+                                                <Input value={photoEditPrompt} onChange={e => photoEditPrompt === e.target.value ? null : setPhotoEditPrompt(e.target.value)} placeholder="e.g., Change my tie to navy blue, remove the shadows..." className="bg-white h-14" />
+                                            </div>
+                                        </div>
+                                    )}
+                                    <p className="text-[9px] font-bold text-slate-400 tracking-[0.1em] uppercase">Powered by Gemini Visual Intelligence</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Text Optimization Section */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Current Headline*</label>
+                                <Input value={headline} onChange={e => setHeadline(e.target.value)} placeholder="e.g., Senior Project Manager at Amazon" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Target Goal</label>
+                                <select value={goal} onChange={e => setGoal(e.target.value)} className="w-full h-[42px] px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm text-sm">
+                                    <option value="job-seeking">Find a new job (Recruiter Focus)</option>
+                                    <option value="personal-brand">Build personal brand (Authority Focus)</option>
+                                    <option value="sales">Generate Leads (Client Focus)</option>
+                                </select>
+                            </div>
+                            <div className="md:col-span-2">
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Current About Section*</label>
+                                    <div className="flex bg-slate-100 dark:bg-slate-900 rounded-lg p-0.5">
+                                        <InputTypeTab active={aboutInputType === 'text'} onClick={() => setAboutInputType('text')}>Existing Bio</InputTypeTab>
+                                        <InputTypeTab active={aboutInputType === 'bullets'} onClick={() => setAboutInputType('bullets')}>Bulleted List</InputTypeTab>
+                                    </div>
+                                </div>
+                                <Textarea
+                                    rows={6}
+                                    value={about}
+                                    onChange={e => setAbout(e.target.value)}
+                                    placeholder={aboutInputType === 'bullets' ? "Enter achievements as bullet points:\n- Managed a team of 10 developers\n- Reduced infrastructure costs by 25%\n- Orchestrated the launch of 'Product X'" : "Paste your current profile intro here..."}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Education History</label>
+                                <Textarea rows={3} value={education} onChange={e => setEducation(e.target.value)} placeholder="List your degrees, schools, and years..." />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Core Skills</label>
+                                <Textarea rows={3} value={skills} onChange={e => setSkills(e.target.value)} placeholder="e.g., Python, React, Team Leadership..." />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-700">
+                            <Button type="submit" disabled={isLoading || !headline || !about} className="h-16 px-12 text-lg font-black uppercase tracking-widest shadow-2xl rounded-2xl transform transition-all hover:scale-[1.02] bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 flex items-center justify-center gap-3">
+                                {isLoading ? <div className="flex items-center gap-3"><Spinner size="sm" className="text-white dark:text-slate-900" /> <span>Building Assets...</span></div> : (
+                                    <>
+                                        <span>Apply Changes & Optimize</span>
+                                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                        {error && <p className="text-center text-red-500 font-bold bg-red-50 p-4 rounded-xl border border-red-100">{error}</p>}
+                    </form>
+                </div>
+            )}
 
             {optimizedContent && (
                 <div className="animate-fade-in space-y-10">
