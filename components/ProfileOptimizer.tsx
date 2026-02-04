@@ -335,26 +335,15 @@ ${optimizedContent.keywords.join(', ')}
                             />
                         </div>
 
-                        <Button
+                        <button
                             type="button"
-                            onClick={handleLinkedInImport}
+                            onClick={() => {
+                                console.log('BUTTON CLICKED!', linkedInUrl);
+                                handleLinkedInImport();
+                            }}
                             disabled={isImporting || !linkedInUrl.trim()}
-                            className="w-full h-14 text-base font-bold"
+                            className="w-full h-14 text-base font-bold bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isImporting ? (
-                                <div className="flex items-center justify-center gap-3">
-                                    <Spinner size="sm" className="text-white" />
-                                    <span>Importing Profile...</span>
-                                </div>
-                            ) : (
-                                <div className="flex items-center justify-center gap-2">
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                    </svg>
-                                    <span>Import Profile Data</span>
-                                </div>
-                            )}
-                        </Button>
                     </div>
                 )}
             </div>
