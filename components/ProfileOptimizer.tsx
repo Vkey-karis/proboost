@@ -102,50 +102,6 @@ export const ProfileOptimizer: React.FC<{ onBack: () => void }> = ({ onBack }) =
     const { addHistoryItem } = useHistory();
     const { checkCredits, deductCredits } = useCredits();
 
-    const handleLinkedInImport = async () => {
-        console.log('Import button clicked');
-        console.log('URL:', linkedInUrl);
-
-        if (!linkedInUrl.trim()) {
-            setError('Please enter a LinkedIn profile URL.');
-            return;
-        }
-
-        setIsImporting(true);
-        setError(null);
-
-        try {
-            console.log('Calling extractLinkedInProfile...');
-            const result = await extractLinkedInProfile(linkedInUrl);
-            console.log('Extraction result:', result);
-
-            if (result.success && result.data) {
-                // Populate form fields with extracted data
-                setHeadline(result.data.headline || '');
-                setAbout(result.data.about || '');
-                setEducation(result.data.education || '');
-                setSkills(result.data.skills || '');
-
-                // Switch to manual mode to show the populated form
-                setInputMode('manual');
-
-                // Clear any errors and show success
-                setError(null);
-
-                // Optional: You could add a success toast/notification here
-                console.log('✓ Profile imported successfully!');
-            } else {
-                console.error('Extraction failed:', result.error);
-                setError(result.error || 'Failed to import LinkedIn profile. Please ensure the profile is public and try again.');
-            }
-        } catch (err) {
-            console.error('Import error catch:', err);
-            setError('An unexpected error occurred while importing the profile. Please check your internet connection and try again.');
-        } finally {
-            setIsImporting(false);
-        }
-    };
-
     const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
