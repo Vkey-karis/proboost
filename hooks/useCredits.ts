@@ -14,11 +14,13 @@ export const useCredits = () => {
                 .from('profiles')
                 .select('credits, tier')
                 .eq('id', user.id)
-                .single();
+                .maybeSingle();
 
             if (data && !error) {
                 setCredits(data.credits);
                 setTier(data.tier || 'free');
+            } else if (error) {
+                console.error('Error fetching credits:', error);
             }
         } catch (err) {
             console.error('Error fetching credits:', err);

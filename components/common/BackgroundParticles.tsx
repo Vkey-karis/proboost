@@ -109,7 +109,7 @@ export const BackgroundParticles: React.FC = () => {
                 id="tsparticles"
                 particlesLoaded={particlesLoaded}
                 options={options}
-                className="absolute inset-0 -z-10 animate-fade-in"
+                className="fixed inset-0 z-0 pointer-events-none"
             />
         );
     }
