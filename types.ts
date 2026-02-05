@@ -85,6 +85,10 @@ export interface ROIAnalysis {
 export interface ApplicationAssets {
     coverLetter: string;
     resume: string;
+    linkedInHeadline: string;
+    linkedInAbout: string;
+    jobKeywords: string[];
+    interviewAnswer: string;
     roiAnalysis: ROIAnalysis;
 }
 

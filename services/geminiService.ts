@@ -167,9 +167,124 @@ export const generateLinkedInPosts = async (inputType: InputType, inputText: str
   return JSON.parse(response.text.trim());
 };
 
-export const generateApplicationAssets = async (jobDescription: string, resumeInfo: string, userEmail: string, template: ProfileTemplate = 'modern', atsCompliance: boolean = false): Promise<ApplicationAssets> => {
+
+const MASTER_RESUME_PROMPT = `
+🧠 1️⃣ MASTER RESUME PROMPT (UPGRADED)
+You are an elite executive resume strategist.
+Your job is NOT to summarize a career.
+Your job is to POSITION this person as the best candidate for a specific target role.
+
+Before writing, identify the TARGET JOB TITLE and optimize ALL content toward that role.
+
+WRITING RULES:
+- Every bullet must show impact, results, or improvement
+- Use metrics whenever possible (%, $, time saved, growth, scale)
+- Replace responsibilities with achievements
+- Remove unrelated experience that does not support the target role
+- Use strong action verbs
+- Keep tone confident and professional
+- Make the resume ATS-optimized using relevant keywords
+
+STRUCTURE:
+1. Professional Summary (3–4 lines focused on value and specialization)
+2. Core Competencies (keywords aligned with target job)
+3. Experience (achievement-based bullets only)
+4. Education
+5. Certifications/Tools (only relevant ones)
+
+If metrics are missing, suggest realistic performance indicators.
+`;
+
+const LINKEDIN_HEADLINE_PROMPT = `
+🧲 3️⃣ LINKEDIN HEADLINE GENERATOR (HIGH-CONVERSION)
+Write 5 powerful LinkedIn headlines for a professional targeting the role.
+The headline must:
+- Clearly state who they help or what they specialize in
+- Include role-specific keywords
+- Show value or outcome
+- Sound confident, not desperate
+Avoid vague phrases like "seeking opportunities" or "open to work".
+`;
+
+const LINKEDIN_ABOUT_PROMPT = `
+🔗 4️⃣ LINKEDIN “ABOUT” SECTION (CLIENT-CONVERTING)
+Rewrite this LinkedIn About section to position the person as a top candidate for the target role.
+Structure:
+1. Opening hook about their professional value
+2. What problems they solve
+3. Key strengths and achievements
+4. Types of roles or companies they fit best
+5. Confident closing line
+Tone: Professional, clear, confident, human
+Avoid fluff and generic motivational lines
+`;
+
+const COVER_LETTER_PROMPT = `
+✉️ 5️⃣ SMART COVER LETTER PROMPT (CRITICAL UPGRADE)
+Write a tailored cover letter for a job application.
+You MUST use:
+- The company name (if available in Job Description)
+- The job title
+- Key requirements from the job description
+- The candidate's real experience
+Show how the candidate’s background directly matches the employer’s needs.
+Tone: Professional, confident, specific
+Length: 200–300 words
+Avoid generic phrases and overused openings.
+`;
+
+const JOB_KEYWORDS_PROMPT = `
+🎯 6️⃣ JOB KEYWORD EXTRACTION PROMPT
+Analyze the job description and extract:
+1. Top hard skills required
+2. Top soft skills mentioned
+3. Frequently repeated keywords
+4. Tools, platforms, or certifications requested
+Format as a list that can be inserted into a resume for ATS optimization.
+`;
+
+const INTERVIEW_ANSWER_PROMPT = `
+🧩 7️⃣ INTERVIEW ANSWER GENERATOR (BONUS FEATURE)
+Write a strong, confident answer to the interview question: "Tell me about yourself"
+The answer should:
+- Be tailored to the target job title
+- Summarize career highlights
+- Show specialization and strengths
+- Be under 90 seconds when spoken
+`;
+
+export const generateApplicationAssets = async (jobDescription: string, resumeInfo: string, userEmail: string, template: ProfileTemplate = 'modern', atsCompliance: boolean = false, targetJobTitle: string = ''): Promise<ApplicationAssets> => {
   const ai = getAIClient();
-  const prompt = `I need a simple resume and cover letter. JOB: ${jobDescription} USER INFO: ${resumeInfo} ${ROI_PROMPT_TEMPLATE} ${READABILITY_GUIDELINES}`;
+
+  const prompt = `
+    TASK: Generate a complete career application package.
+    
+    TARGET JOB TITLE: ${targetJobTitle || "Professional Role"}
+    
+    CLIENT EXPERIENCE:
+    ${resumeInfo}
+    
+    JOB DESCRIPTION:
+    ${jobDescription}
+    
+    INSTRUCTIONS:
+    Execute the following prompts based on the provided inputs:
+    
+    ${MASTER_RESUME_PROMPT}
+    
+    ${LINKEDIN_HEADLINE_PROMPT}
+    
+    ${LINKEDIN_ABOUT_PROMPT}
+    
+    ${COVER_LETTER_PROMPT}
+    
+    ${JOB_KEYWORDS_PROMPT}
+    
+    ${INTERVIEW_ANSWER_PROMPT}
+
+    ${ROI_PROMPT_TEMPLATE}
+  `;
+
   const response = await executeSafe(() => ai.models.generateContent({
     model: PRO_THINKING_MODEL,
     contents: prompt,
@@ -181,6 +296,10 @@ export const generateApplicationAssets = async (jobDescription: string, resumeIn
         properties: {
           coverLetter: { type: Type.STRING },
           resume: { type: Type.STRING },
+          linkedInHeadline: { type: Type.STRING },
+          linkedInAbout: { type: Type.STRING },
+          jobKeywords: { type: Type.ARRAY, items: { type: Type.STRING } },
+          interviewAnswer: { type: Type.STRING },
           roiAnalysis: {
             type: Type.OBJECT,
             properties: {
@@ -192,12 +311,13 @@ export const generateApplicationAssets = async (jobDescription: string, resumeIn
             required: ['timeSavedHours', 'estimatedValueSaved', 'potentialSalaryBoost', 'marketValueDescription']
           }
         },
-        required: ['coverLetter', 'resume', 'roiAnalysis']
+        required: ['coverLetter', 'resume', 'linkedInHeadline', 'linkedInAbout', 'jobKeywords', 'interviewAnswer', 'roiAnalysis']
       }
     }
   }));
   return JSON.parse(response.text.trim());
 };
+
 
 export const generateInterviewGuide = async (jobDetails: string, companyName?: string): Promise<InterviewPrepAssets> => {
   const ai = getAIClient();

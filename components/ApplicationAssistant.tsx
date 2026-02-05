@@ -134,8 +134,8 @@ const AssetDisplayCard: React.FC<AssetDisplayCardProps> = ({ title, content, tem
                         onClick={() => isEditing ? handleSave() : setIsEditing(true)}
                         disabled={isSaving}
                         className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md ${isEditing
-                                ? 'bg-green-600 text-white hover:bg-green-700 active:scale-95'
-                                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-primary-400'
+                            ? 'bg-green-600 text-white hover:bg-green-700 active:scale-95'
+                            : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-primary-400'
                             }`}
                     >
                         {isSaving ? (
@@ -258,11 +258,13 @@ interface AppAssistantState {
     template: ProfileTemplate;
     atsCompliance: boolean;
     generatedAssets: ApplicationAssets | null;
+    targetJobTitle: string; // [NEW] Save target job title in history
 }
 
 export const ApplicationAssistant: React.FC = () => {
     const [jdInputType, setJdInputType] = useState<'paste' | 'url' | 'file'>('paste');
     const [historyInputType, setHistoryInputType] = useState<'text' | 'bullets'>('text');
+    const [targetJobTitle, setTargetJobTitle] = useState(''); // [NEW] Target Job Title state
     const [jobDescription, setJobDescription] = useState('');
     const [jobDescriptionUrl, setJobDescriptionUrl] = useState('');
     const [resumeInfo, setResumeInfo] = useState('');
@@ -312,6 +314,7 @@ export const ApplicationAssistant: React.FC = () => {
         setTemplate(lastState.template);
         setAtsCompliance(lastState.atsCompliance);
         setGeneratedAssets(lastState.generatedAssets);
+        setTargetJobTitle(lastState.targetJobTitle); // [NEW] Restore target job title
         setLastState(null);
     }, [lastState]);
 
@@ -376,6 +379,7 @@ export const ApplicationAssistant: React.FC = () => {
             userEmail,
             template,
             atsCompliance,
+            targetJobTitle, // [NEW] Save target job title
             generatedAssets
         });
 
@@ -383,11 +387,11 @@ export const ApplicationAssistant: React.FC = () => {
         setError(null);
         setGeneratedAssets(null);
         try {
-            const results = await generateApplicationAssets(jobDescription, resumeInfo, userEmail, template, atsCompliance);
+            const results = await generateApplicationAssets(jobDescription, resumeInfo, userEmail, template, atsCompliance, targetJobTitle); // [NEW] Pass targetJobTitle
             setGeneratedAssets(results);
             addHistoryItem({
                 featureType: FeatureName.JobApplication,
-                input: { jobDescription, resumeInfo, userEmail, template, atsCompliance, historyInputType },
+                input: { jobDescription, resumeInfo, userEmail, template, atsCompliance, historyInputType, targetJobTitle }, // [NEW] Save in history
                 output: results
             });
         } catch (err) {
@@ -395,7 +399,7 @@ export const ApplicationAssistant: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [jobDescription, resumeInfo, userEmail, template, atsCompliance, historyInputType, generatedAssets, addHistoryItem]);
+    }, [jobDescription, resumeInfo, userEmail, template, atsCompliance, historyInputType, generatedAssets, addHistoryItem, targetJobTitle]);
 
     const updateAssetContent = (key: keyof ApplicationAssets, newContent: string) => {
         setGeneratedAssets(prev => prev ? { ...prev, [key]: newContent } : null);
@@ -444,7 +448,18 @@ export const ApplicationAssistant: React.FC = () => {
                         </div>
 
                         <div className="space-y-4">
-                            <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2">Job Opportunity</label>
+                            <div>
+                                <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2 mb-2">Target Job Title</label>
+                                <Input
+                                    type="text"
+                                    value={targetJobTitle}
+                                    onChange={(e) => setTargetJobTitle(e.target.value)}
+                                    placeholder="e.g. Senior Product Manager"
+                                    className="h-14 rounded-2xl px-6 font-bold text-lg"
+                                />
+                            </div>
+
+                            <label className="block text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2">Job Opportunity (Optional)</label>
                             <div className="border-b border-slate-100 dark:border-slate-800 mb-3">
                                 <nav className="-mb-px flex space-x-6">
                                     <InputTypeTab active={jdInputType === 'paste'} onClick={() => setJdInputType('paste')}>Paste</InputTypeTab>
@@ -538,6 +553,65 @@ export const ApplicationAssistant: React.FC = () => {
                         </div>
 
                         <ValueQuantifierCard roi={generatedAssets.roiAnalysis} />
+
+                        {/* [NEW] Job Keywords Section */}
+                        <section className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] shadow-xl border border-slate-200 dark:border-slate-700">
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-2xl">
+                                    <svg className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black uppercase tracking-tight">Power Keywords</h3>
+                                    <p className="text-xs text-slate-500 font-medium">ATS-Optimized Skills for this Role</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {generatedAssets.jobKeywords.map((keyword, idx) => (
+                                    <span key={idx} className="px-4 py-2 bg-slate-100 dark:bg-slate-900 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                                        {keyword}
+                                    </span>
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* [NEW] LinkedIn Section */}
+                        <section className="overflow-visible relative">
+                            <div className="flex items-center gap-4 mb-8 px-4">
+                                <div className="w-3 h-10 bg-[#0077b5] rounded-full" />
+                                <h3 className="text-3xl font-black uppercase tracking-tight">LinkedIn Optimization</h3>
+                            </div>
+
+                            <div className="space-y-8">
+                                <AssetDisplayCard
+                                    title="High-Converting Headline"
+                                    content={generatedAssets.linkedInHeadline}
+                                    template={template}
+                                    onUpdate={(c) => updateAssetContent('linkedInHeadline', c)}
+                                />
+                                <AssetDisplayCard
+                                    title="Profile 'About' Section"
+                                    content={generatedAssets.linkedInAbout}
+                                    template={template}
+                                    onUpdate={(c) => updateAssetContent('linkedInAbout', c)}
+                                />
+                            </div>
+                        </section>
+
+                        {/* [NEW] Interview Prep Section */}
+                        <section className="overflow-visible relative">
+                            <div className="flex items-center gap-4 mb-8 px-4">
+                                <div className="w-3 h-10 bg-orange-500 rounded-full" />
+                                <h3 className="text-3xl font-black uppercase tracking-tight">Interview Prep</h3>
+                            </div>
+                            <AssetDisplayCard
+                                title="Tell Me About Yourself"
+                                content={generatedAssets.interviewAnswer}
+                                template={template}
+                                onUpdate={(c) => updateAssetContent('interviewAnswer', c)}
+                            />
+                        </section>
 
                         <section className="overflow-visible relative">
                             <div className="flex items-center gap-4 mb-8 px-4">
