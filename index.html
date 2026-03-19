@@ -30,37 +30,8 @@
   <meta name="theme-color" content="#2563eb" />
   <meta name="monetag" content="27518e587bf1b93a85f6496dc4157341" />
 
-  <!--
-    ══════════════════════════════════════════════════════════════════
-    MONETAG — Activation Checklist
-    ══════════════════════════════════════════════════════════════════
-    STEP 1: Sign up / log in at monetag.com
-    STEP 2: Go to Sites → Add Site → enter proboost.aimoneygigs.com
-    STEP 3: Create your zones under "Ad Units":
-            • Zone A → "In-Page Push"   (paste Zone ID below)
-            • Zone B → "Interstitial"   (paste into AdUnit.tsx BANNER_ZONES)
-    STEP 4: Copy the CDN domain from the embed code they give you
-            (e.g. gizmochipu.com) → paste into AdUnit.tsx MONETAG_CDN
-    STEP 5: Uncomment the In-Page Push script below and fill in
-            YOUR_CDN_DOMAIN and YOUR_IN_PAGE_PUSH_ZONE_ID
-    ══════════════════════════════════════════════════════════════════
-  -->
-
-  <!--
-    IN-PAGE PUSH ZONE (least intrusive Monetag format)
-    Renders a small notification-style ad in the bottom-right corner.
-    Does NOT block content. User can dismiss it instantly.
-    Uncomment and fill in your Zone ID when ready:
-  -->
-  <!--
-  <script>
-    (function(d,z,s){
-      s.src='https://' + d + '/401/' + z;
-      try{ (document.body||document.documentElement).appendChild(s) } catch(e){}
-    })('YOUR_CDN_DOMAIN', YOUR_IN_PAGE_PUSH_ZONE_ID, document.createElement('script'))
-  </script>
-  -->
-
+  <!-- Monetag In-Page Push — Zone 10749432 (auto-renders in bottom-right corner) -->
+  <script>(function(s){s.dataset.zone='10749432',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
