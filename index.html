@@ -31,28 +31,35 @@
 
   <!--
     ══════════════════════════════════════════════════════════════════
-    GOOGLE ADSENSE — Activation Checklist
+    MONETAG — Activation Checklist
     ══════════════════════════════════════════════════════════════════
-    STEP 1: Apply at https://adsense.google.com/start
-    STEP 2: Uncomment the meta tag below and replace XXXX with your
-            actual AdSense publisher verification code.
-    STEP 3: Uncomment the <script> tag below and replace
-            ca-pub-XXXXXXXXXXXXXXXX with your Publisher ID.
-    STEP 4: In components/common/AdUnit.tsx, fill in ADSENSE_CLIENT
-            and the SLOTS object with your ad unit slot IDs.
+    STEP 1: Sign up / log in at monetag.com
+    STEP 2: Go to Sites → Add Site → enter proboost.aimoneygigs.com
+    STEP 3: Create your zones under "Ad Units":
+            • Zone A → "In-Page Push"   (paste Zone ID below)
+            • Zone B → "Interstitial"   (paste into AdUnit.tsx BANNER_ZONES)
+    STEP 4: Copy the CDN domain from the embed code they give you
+            (e.g. gizmochipu.com) → paste into AdUnit.tsx MONETAG_CDN
+    STEP 5: Uncomment the In-Page Push script below and fill in
+            YOUR_CDN_DOMAIN and YOUR_IN_PAGE_PUSH_ZONE_ID
     ══════════════════════════════════════════════════════════════════
   -->
 
-  <!-- STEP 2: AdSense site verification (uncomment when you apply) -->
   <!--
-  <meta name="google-adsense-account" content="ca-pub-XXXXXXXXXXXXXXXX" />
+    IN-PAGE PUSH ZONE (least intrusive Monetag format)
+    Renders a small notification-style ad in the bottom-right corner.
+    Does NOT block content. User can dismiss it instantly.
+    Uncomment and fill in your Zone ID when ready:
+  -->
+  <!--
+  <script>
+    (function(d,z,s){
+      s.src='https://' + d + '/401/' + z;
+      try{ (document.body||document.documentElement).appendChild(s) } catch(e){}
+    })('YOUR_CDN_DOMAIN', YOUR_IN_PAGE_PUSH_ZONE_ID, document.createElement('script'))
+  </script>
   -->
 
-  <!-- STEP 3: AdSense async script (uncomment when approved) -->
-  <!--
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-    crossorigin="anonymous"></script>
-  -->
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
