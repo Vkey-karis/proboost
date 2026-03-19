@@ -3,6 +3,7 @@ import React from 'react';
 import { FEATURES } from '../constants.tsx';
 import { Feature, FeatureName } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
+import { AdUnit } from './common/AdUnit.tsx';
 
 interface DashboardProps {
   onSelectFeature: (feature: FeatureName) => void;
@@ -132,8 +133,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectFeature }) => {
                 <button
                   onClick={() => onSelectFeature(user ? FeatureName.Resources : FeatureName.Auth)}
                   className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-colors shadow-lg ${user
-                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary-600 dark:hover:bg-primary-400'
-                      : 'bg-primary-600 hover:bg-primary-700 text-white animate-pulse'
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-primary-600 dark:hover:bg-primary-400'
+                    : 'bg-primary-600 hover:bg-primary-700 text-white animate-pulse'
                     }`}
                 >
                   {user ? 'Upgrade' : 'Start for Free'}
@@ -163,6 +164,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSelectFeature }) => {
               </div>
             </div>
           </div>
+
+          {/* AdSense — shown to free users only */}
+          <AdUnit placement="dashboard-sidebar" className="w-full" />
         </div>
 
         {/* Main Content Area */}

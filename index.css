@@ -71,3 +71,19 @@
     transform: translateY(0);
   }
 }
+
+/* ── Google AdSense Styling ─────────────────────────────────────────────── */
+/* AdSense renders inside a sandboxed iframe, so minimal external CSS needed. */
+/* We style only the wrapper and the 'Sponsored' label above each unit.       */
+
+.adsense-wrapper {
+  width: 100%;
+}
+
+/* Ensure the <ins> tag fills its container */
+.adsbygoogle {
+  display: block;
+  width: 100%;
+  min-height: 90px;
+  /* Prevents layout shift while ad loads */
+}

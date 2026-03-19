@@ -10,6 +10,7 @@ import { JobSearchResult, FeatureName } from '../types.ts';
 import { useHistory } from '../hooks/useHistory.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useCredits } from '../hooks/useCredits.ts';
+import { AdUnit } from './common/AdUnit.tsx';
 
 const JOB_ALERT_KEY = 'proboost-job-alerts-active';
 
@@ -339,6 +340,9 @@ export const JobSearchTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   </div>
                 </div>
               </div>
+
+              {/* AdSense — contextual, below market analysis */}
+              <AdUnit placement="job-search-sidebar" />
             </div>
           </div>
         </div>
