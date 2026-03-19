@@ -115,22 +115,42 @@ export const Resources: React.FC<ResourcesProps> = ({ onSelectFeature, onBack })
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-[1400px] mx-auto items-stretch">
                     <PricingTier
                         title="Free Trial" price="Free" period="24 Hours" tokenCap="Trial" description="Try everything for a whole day."
-                        apps={[{ name: "All 11 Apps", included: true }, { name: "Fast AI Help", included: true }, { name: "Find Jobs", included: true }]}
+                        apps={[
+                            { name: "All 11 Apps", included: true },
+                            { name: "Fast AI Help", included: true },
+                            { name: "Find Jobs", included: true },
+                            { name: "Ad-free Experience", included: false },
+                        ]}
                         cta="Try it for free" onCta={() => onSelectFeature(FeatureName.JobSearch)}
                     />
                     <PricingTier
                         title="Hunter" price="$29" tokenCap="Standard" description="Best for finding a new job fast."
-                        apps={[{ name: "Job Search AI", included: true }, { name: "Resume Fixer", included: true }, { name: "Interview Help", included: true }]}
+                        apps={[
+                            { name: "Job Search AI", included: true },
+                            { name: "Resume Fixer", included: true },
+                            { name: "Interview Help", included: true },
+                            { name: "Ad-free Experience", included: true, premium: true },
+                        ]}
                         cta="Go Hunter" onCta={() => handlePlanSelect('Hunter', '$29')}
                     />
                     <PricingTier
                         title="Authority" price="$59" highlight tokenCap="Extra" description="Build a huge brand on LinkedIn."
-                        apps={[{ name: "Everything in Hunter", included: true }, { name: "Profile Optimizer", included: true, premium: true }, { name: "News-to-Viral AI", included: true, premium: true }]}
+                        apps={[
+                            { name: "Everything in Hunter", included: true },
+                            { name: "Profile Optimizer", included: true, premium: true },
+                            { name: "News-to-Viral AI", included: true, premium: true },
+                            { name: "Ad-free Experience", included: true, premium: true },
+                        ]}
                         cta="Get full access" onCta={() => handlePlanSelect('Authority', '$59')}
                     />
                     <PricingTier
                         title="Agency" price="$169" tokenCap="Unlimited" description="For career coaches."
-                        apps={[{ name: "All 11 Apps", included: true }, { name: "A Lot of Tokens", included: true, premium: true }, { name: "Use Your Own Key", included: true, premium: true }]}
+                        apps={[
+                            { name: "All 11 Apps", included: true },
+                            { name: "A Lot of Tokens", included: true, premium: true },
+                            { name: "Use Your Own Key", included: true, premium: true },
+                            { name: "Ad-free Experience", included: true, premium: true },
+                        ]}
                         cta="Contact Us" onCta={() => window.location.href = 'mailto:Samuel@aimoneygigs.com'}
                     />
                 </div>
